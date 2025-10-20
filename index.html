@@ -224,7 +224,7 @@
             <option value="basic">Montecarlo — Básico</option>
             <option value="improved" selected>Montecarlo — Mejorado</option>
           </select>
-          <button id="calcBtn" class="secondary">Calcular asignación (100 000 iter.)</button>
+          <button id="calcBtn" class="secondary">Calcular asignación (500.000 iter.)</button>
         </div>
       </div>
 
@@ -535,7 +535,7 @@
      * Penalizaciones (incluye huecos en divisiones)
      *************************/
     const PENALTIES = {
-      preferenceMismatch: 300000,
+      preferenceMismatch: 1000000,
       kidsConflictAdj: 5000,
       multiNotSameZone: 50000,
       multiNotContiguous: 20000,
@@ -563,6 +563,7 @@
       salonEarlyOpen: "Apertura prematura de salón",
       celebrationMixedSalon: "Celebración mezclada con no celebración en salón" // NUEVO
     };
+
 
     /*************************
      * Helper: mínimo de mesas necesarias (maxCaps: 9,6,4)
@@ -1214,7 +1215,7 @@ function salonEarlyOpenPenalty(assign) {
     }
 
     // === Montecarlo Mejorado
-    async function runMonteCarloImproved(iterations = 100000) {
+    async function runMonteCarloImproved(iterations = 500000) {
       if (state.reservations.length === 0) { alert('Agrega reservas primero'); return; }
       resetChart();
 
@@ -1254,7 +1255,7 @@ function salonEarlyOpenPenalty(assign) {
     }
 
     // === Montecarlo Básico
-    async function runMonteCarloBasic(iterations = 100000) {
+    async function runMonteCarloBasic(iterations = 500000) {
       if (state.reservations.length === 0) { alert('Agrega reservas primero'); return; }
       resetChart();
 
@@ -1295,10 +1296,10 @@ function salonEarlyOpenPenalty(assign) {
       clearPenaltiesUI(); // limpia tarjetas previas
       const algo = elAlgo.value;
       if (algo === 'basic') {
-        runMonteCarloBasic(100000);
+        runMonteCarloBasic(500000);
       } else {
         // 'improved'
-        runMonteCarloImproved(100000);
+        runMonteCarloImproved(500000);
       }
     });
 
