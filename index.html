@@ -71,13 +71,13 @@
     button.secondary { background: #22c55e; }
     button.danger { background: var(--danger); }
 
-    /* Formulario: añadimos columna para Celebración y botón */
-    .form-grid { display:grid; grid-template-columns:1.2fr 0.7fr 0.7fr 0.7fr 0.9fr auto; gap:10px; }
+    /* Formulario: ampliamos columnas para incluir preferencia de salón/mesa */
+    .form-grid { display:grid; grid-template-columns:1.2fr 0.6fr 0.7fr 0.7fr 0.9fr 1fr 1.2fr auto; gap:10px; }
 
-    /* Listado de reservas: añadimos columna Celebración */
+    /* Listado de reservas: añadimos columna Preferencia */
     .res-row, .grid-header {
       display: grid;
-      grid-template-columns: 2fr 0.8fr 0.8fr 0.9fr 0.9fr auto;
+      grid-template-columns: 2fr 0.8fr 0.8fr 0.9fr 0.9fr 1.4fr auto;
       gap: 10px;
       align-items: center;
       padding: 10px;
@@ -124,7 +124,6 @@
       background: #fff;
     }
 
-    
     .badge {
       font-size: 12px;
       float: right;
@@ -150,9 +149,7 @@
     .pen-header {
       display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:10px;
     }
-    .pen-total {
-      text-align:right;
-    }
+    .pen-total { text-align:right; }
     .pen-total .label { font-size:12px; color:#666; text-transform:uppercase; }
     .pen-total .value { font-size:26px; font-weight:800; }
     .pen-mesa {
@@ -170,9 +167,7 @@
     .pen-box {
       border:1px solid #eee; border-radius:10px; padding:8px; background:#fafafa;
     }
-    .pen-box h4 {
-      margin:0 0 4px; font-size:14px;
-    }
+    .pen-box h4 { margin:0 0 4px; font-size:14px; }
     .pen-box .pts { font-weight:700; float:right; }
     .pen-list { margin:0; padding-left:18px; }
     .pen-list li { font-size:13px; margin:3px 0; }
@@ -203,12 +198,30 @@
           <select id="kids"><option value="no">No</option><option value="si">Sí</option></select></div>
         <div><label>¿Celebración?</label>
           <select id="celebration"><option value="no">No</option><option value="si">Sí</option></select></div>
+
+        <!-- NUEVOS CAMPOS -->
+        <div>
+          <label>Salón preferido</label>
+          <select id="prefSalon">
+            <option value="ninguno">Ninguno</option>
+            <option value="salon1">Salón 1</option>
+            <option value="salon2">Salón 2</option>
+            <option value="salon3">Salón 3</option>
+          </select>
+        </div>
+        <div>
+          <label>Mesa preferida (del salón)</label>
+          <select id="prefTable">
+            <option value="">— Selecciona salón —</option>
+          </select>
+        </div>
+
         <button id="saveBtn" class="secondary">Guardar</button>
       </div>
 
       <h2>Reservas</h2>
       <div class="grid-header">
-        <div>Nombre</div><div>Personas</div><div>Terraza</div><div>Niños</div><div>Celebración</div><div>Acciones</div>
+        <div>Nombre</div><div>Personas</div><div>Terraza</div><div>Niños</div><div>Celebración</div><div>Preferencia</div><div>Acciones</div>
       </div>
       <div id="reservationsList"></div>
     </section>
@@ -370,7 +383,7 @@
           const row = Math.floor(i / cols);
           const col = i % cols;
 
-          for (let dr = -1; dr <= 1; dr++) {
+        for (let dr = -1; dr <= 1; dr++) {
             for (let dc = -1; dc <= 1; dc++) {
               if (dr === 0 && dc === 0) continue;
               const nr = row + dr, nc = col + dc;
@@ -385,10 +398,10 @@
       }
 
       const tableById = new Map(TABLES.map(t => [t.id, t]));
-      return { TABLES, adjacencyPairs, adjacencyById, tableById, GRID_COLS };
+      return { TABLES, adjacencyPairs, adjacencyById, tableById, GRID_COLS, zones };
     }
 
-    const { TABLES, adjacencyPairs, adjacencyById, tableById } = buildTables();
+    const { TABLES, adjacencyPairs, adjacencyById, tableById, zones } = buildTables();
 
     // === Capacidad por zona (sumando maxCap) para la regla de “salones por escalado” ===
     const ZONE_CAPACITY = (() => {
@@ -410,6 +423,9 @@
     const elTerrace = document.getElementById('terrace');
     const elKids = document.getElementById('kids');
     const elCelebration = document.getElementById('celebration');
+    const elPrefSalon = document.getElementById('prefSalon');
+    const elPrefTable = document.getElementById('prefTable');
+
     const elSave = document.getElementById('saveBtn');
     const elCalc = document.getElementById('calcBtn');
     const elAlgo = document.getElementById('algoSelect');
@@ -531,8 +547,9 @@
       ctx.font = '12px system-ui, sans-serif';
       ctx.fillText(`Iter ${n} → ${bestHistory[n-1]}`, Math.min(W - 140, xLast + 6), Math.max(14, yLast - 6));
     }
+
     /*************************
-     * Penalizaciones (incluye huecos en divisiones)
+     * Penalizaciones (añadimos exactPreferredTable)
      *************************/
     const PENALTIES = {
       preferenceMismatch: 1000000,
@@ -546,7 +563,8 @@
       multiSeatGaps: 200,
       unseatedReservation: 40000,
       salonEarlyOpen: 200000,
-      celebrationMixedSalon: 150000  // NUEVO
+      celebrationMixedSalon: 500000,
+      exactPreferredTable: 1000  // NUEVO
     };
 
     const TYPE_LABEL = {
@@ -561,9 +579,9 @@
       multiSeatGaps: "Huecos por división (200/puesto)",
       unseatedReservation: "Reserva no sentada",
       salonEarlyOpen: "Apertura prematura de salón",
-      celebrationMixedSalon: "Celebración mezclada con no celebración en salón" // NUEVO
+      celebrationMixedSalon: "Celebración mezclada con no celebración en salón",
+      exactPreferredTable: "No sentado en mesa preferida del salón" // NUEVO
     };
-
 
     /*************************
      * Helper: mínimo de mesas necesarias (maxCaps: 9,6,4)
@@ -644,167 +662,154 @@
       return visited.size === usedIds.size;
     }
 
-    
-/*************************
- * Regla “abrir el mínimo de salones” — IGNORANDO CELEBRACIONES
- *************************/
-const SALON_KEYS = ['salon1', 'salon2', 'salon3'];
+    /*************************
+     * Regla “abrir el mínimo de salones” — IGNORANDO CELEBRACIONES
+     *************************/
+    const SALON_KEYS = ['salon1', 'salon2', 'salon3'];
 
-function computeSalonUsage(assign) {
-  const isCelebration = new Map(state.reservations.map(r => [r.id, r.celebration === 'si']));
+    function computeSalonUsage(assign) {
+      const isCelebration = new Map(state.reservations.map(r => [r.id, r.celebration === 'si']));
 
-  // "salonOpen" aquí significa: hay alguna reserva NO-celebración sentada en ese salón
-  const salonOpen = { salon1: false, salon2: false, salon3: false };
+      // "salonOpen" aquí significa: hay alguna reserva NO-celebración sentada en ese salón
+      const salonOpen = { salon1: false, salon2: false, salon3: false };
 
-  // Mesas por reserva
-  const tablesByRes = new Map();
-  for (const [tid, rid] of assign.entries()) {
-    if (!rid) continue;
-    const t = tableById.get(tid);
-    if (!t) continue;
-    if (!tablesByRes.has(rid)) tablesByRes.set(rid, []);
-    tablesByRes.get(rid).push(t);
-  }
-
-  // Ocupación por salón SOLO con NO-celebración (sumando pax de reservas ubicadas íntegramente en ese salón)
-  const paxBySalon = { salon1: 0, salon2: 0, salon3: 0 };
-
-  for (const r of state.reservations) {
-    if (isCelebration.get(r.id)) continue; // ignoramos celebraciones
-    const used = tablesByRes.get(r.id) || [];
-    if (!used.length) continue;
-
-    // marcar salón abierto si hay NO-celebración en él
-    const zonesUsed = new Set(used.map(t => t.zone));
-    for (const z of zonesUsed) {
-      if (z === 'salon1' || z === 'salon2' || z === 'salon3') salonOpen[z] = true;
-    }
-
-    // sumar pax si está íntegramente en un único salón
-    if (zonesUsed.size === 1) {
-      const z = used[0].zone;
-      if (z === 'salon1' || z === 'salon2' || z === 'salon3') paxBySalon[z] += r.pax;
-    }
-  }
-
-  return { salonOpen, paxBySalon };
-}
-
-// ¿El salón está abierto exclusivamente para celebraciones?
-function salonComposition(assign) {
-  const comp = {
-    salon1: { celebr: 0, nonCelebr: 0 },
-    salon2: { celebr: 0, nonCelebr: 0 },
-    salon3: { celebr: 0, nonCelebr: 0 },
-  };
-
-  const isCelebration = new Map(state.reservations.map(r => [r.id, r.celebration === 'si']));
-
-  const tablesByRes = new Map();
-  for (const [tid, rid] of assign.entries()) {
-    if (!rid) continue;
-    const t = tableById.get(tid);
-    if (!t) continue;
-    if (!tablesByRes.has(rid)) tablesByRes.set(rid, []);
-    tablesByRes.get(rid).push(t);
-  }
-
-  for (const [rid, tables] of tablesByRes.entries()) {
-    const salons = new Set(
-      tables.map(t => t.zone).filter(z => z === 'salon1' || z === 'salon2' || z === 'salon3')
-    );
-    for (const z of salons) {
-      if (isCelebration.get(rid)) comp[z].celebr += 1;
-      else comp[z].nonCelebr += 1;
-    }
-  }
-
-  return comp;
-}
-
-/* ======= NUEVA LÓGICA: penalización solo si
-   - el salón previo útil ≤ 80% de su capacidad
-   - y (x + 5) (personas no celebración del salón nuevo) cabrían en ese salón previo
-   - celebraciones exentas (si el salón nuevo es solo celebraciones, no penaliza)
-======= */
-function salonEarlyOpenPenalty(assign) {
-  const { salonOpen, paxBySalon } = computeSalonUsage(assign);
-  const comp = salonComposition(assign);
-
-  const cap1 = ZONE_CAPACITY.salon1;
-  const cap2 = ZONE_CAPACITY.salon2;
-  const cap3 = ZONE_CAPACITY.salon3;
-
-  // ¿Cada salón contiene exclusivamente celebraciones?
-  const s1OnlyCelebr = comp.salon1.celebr > 0 && comp.salon1.nonCelebr === 0;
-  const s2OnlyCelebr = comp.salon2.celebr > 0 && comp.salon2.nonCelebr === 0;
-  const s3OnlyCelebr = comp.salon3.celebr > 0 && comp.salon3.nonCelebr === 0;
-
-  let penalty = 0;
-  const offenders = [];
-
-  // ---------- Evaluar apertura de SALÓN 2 respecto a SALÓN 1 ----------
-  if (!s2OnlyCelebr && salonOpen.salon2) {
-    // Debe existir un salón previo "útil" con no-celebraciones (S1)
-    if (comp.salon1.nonCelebr > 0) {
-      const prevOcc = paxBySalon.salon1;     // no-celebraciones en S1 (solo reservas íntegramente en S1)
-      const prevCap = cap1;
-      const prev80  = 0.8 * prevCap;
-
-      // x = no-celebraciones ubicadas íntegramente en S2
-      const x = paxBySalon.salon2;
-      const freePrev = Math.max(0, prevCap - prevOcc);
-
-      const condition80 = prevOcc <= prev80;
-      const conditionFit = freePrev >= (x + 5);
-
-      if (condition80 && conditionFit) {
-        penalty += PENALTIES.salonEarlyOpen;
-        offenders.push({
-          salon: 'salon2',
-          detail: `S1 ocupado por no-celebraciones ${prevOcc}/${prevCap} (≤80%), libre ${freePrev}; S2 aloja x=${x} → x+5=${x+5} cabía en S1`
-        });
+      // Mesas por reserva
+      const tablesByRes = new Map();
+      for (const [tid, rid] of assign.entries()) {
+        if (!rid) continue;
+        const t = tableById.get(tid);
+        if (!t) continue;
+        if (!tablesByRes.has(rid)) tablesByRes.set(rid, []);
+        tablesByRes.get(rid).push(t);
       }
-    }
-  }
 
-  // ---------- Evaluar apertura de SALÓN 3 respecto al último salón previo útil ----------
-  if (!s3OnlyCelebr && salonOpen.salon3) {
-    // Determinar el "último salón previo útil" con no-celebraciones (S2 preferente; si no, S1)
-    const hasS2NonCeleb = comp.salon2.nonCelebr > 0;
-    const hasS1NonCeleb = comp.salon1.nonCelebr > 0;
+      // Ocupación por salón SOLO con NO-celebración (sumando pax de reservas ubicadas íntegramente en ese salón)
+      const paxBySalon = { salon1: 0, salon2: 0, salon3: 0 };
 
-    const prevSalonKey = hasS2NonCeleb ? 'salon2' : (hasS1NonCeleb ? 'salon1' : null);
-    if (prevSalonKey) {
-      const prevCap = prevSalonKey === 'salon2' ? cap2 : cap1;
-      const prevOcc = paxBySalon[prevSalonKey];
-      const prev80  = 0.8 * prevCap;
+      for (const r of state.reservations) {
+        if (isCelebration.get(r.id)) continue; // ignoramos celebraciones
+        const used = tablesByRes.get(r.id) || [];
+        if (!used.length) continue;
 
-      // x = no-celebraciones ubicadas íntegramente en S3
-      const x = paxBySalon.salon3;
-      const freePrev = Math.max(0, prevCap - prevOcc);
+        // marcar salón abierto si hay NO-celebración en él
+        const zonesUsed = new Set(used.map(t => t.zone));
+        for (const z of zonesUsed) {
+          if (z === 'salon1' || z === 'salon2' || z === 'salon3') salonOpen[z] = true;
+        }
 
-      const condition80 = prevOcc <= prev80;
-      const conditionFit = freePrev >= (x + 5);
-
-      if (condition80 && conditionFit) {
-        penalty += PENALTIES.salonEarlyOpen;
-        offenders.push({
-          salon: 'salon3',
-          detail: `Previo útil ${prevSalonKey.toUpperCase().replace('SALON','S')} ${prevOcc}/${prevCap} (≤80%), libre ${freePrev}; S3 aloja x=${x} → x+5=${x+5} cabía en ${prevSalonKey}`
-        });
+        // sumar pax si está íntegramente en un único salón
+        if (zonesUsed.size === 1) {
+          const z = used[0].zone;
+          if (z === 'salon1' || z === 'salon2' || z === 'salon3') paxBySalon[z] += r.pax;
+        }
       }
-    }
-  }
 
-  return { penalty, offenders };
-}
+      return { salonOpen, paxBySalon };
+    }
+
+    // ¿El salón está abierto exclusivamente para celebraciones?
+    function salonComposition(assign) {
+      const comp = {
+        salon1: { celebr: 0, nonCelebr: 0 },
+        salon2: { celebr: 0, nonCelebr: 0 },
+        salon3: { celebr: 0, nonCelebr: 0 },
+      };
+
+      const isCelebration = new Map(state.reservations.map(r => [r.id, r.celebration === 'si']));
+
+      const tablesByRes = new Map();
+      for (const [tid, rid] of assign.entries()) {
+        if (!rid) continue;
+        const t = tableById.get(tid);
+        if (!t) continue;
+        if (!tablesByRes.has(rid)) tablesByRes.set(rid, []);
+        tablesByRes.get(rid).push(t);
+      }
+
+      for (const [rid, tables] of tablesByRes.entries()) {
+        const salons = new Set(
+          tables.map(t => t.zone).filter(z => z === 'salon1' || z === 'salon2' || z === 'salon3')
+        );
+        for (const z of salons) {
+          if (isCelebration.get(rid)) comp[z].celebr += 1;
+          else comp[z].nonCelebr += 1;
+        }
+      }
+
+      return comp;
+    }
+
+    /* ======= Penalización por apertura prematura (ya incluida) ======= */
+    function salonEarlyOpenPenalty(assign) {
+      const { salonOpen, paxBySalon } = computeSalonUsage(assign);
+      const comp = salonComposition(assign);
+
+      const cap1 = ZONE_CAPACITY.salon1;
+      const cap2 = ZONE_CAPACITY.salon2;
+      const cap3 = ZONE_CAPACITY.salon3;
+
+      const s1OnlyCelebr = comp.salon1.celebr > 0 && comp.salon1.nonCelebr === 0;
+      const s2OnlyCelebr = comp.salon2.celebr > 0 && comp.salon2.nonCelebr === 0;
+      const s3OnlyCelebr = comp.salon3.celebr > 0 && comp.salon3.nonCelebr === 0;
+
+      let penalty = 0;
+      const offenders = [];
+
+      if (!s2OnlyCelebr && salonOpen.salon2) {
+        if (comp.salon1.nonCelebr > 0) {
+          const prevOcc = paxBySalon.salon1;
+          const prevCap = cap1;
+          const prev80  = 0.8 * prevCap;
+
+          const x = paxBySalon.salon2;
+          const freePrev = Math.max(0, prevCap - prevOcc);
+
+          const condition80 = prevOcc <= prev80;
+          const conditionFit = freePrev >= (x + 5);
+
+          if (condition80 && conditionFit) {
+            penalty += PENALTIES.salonEarlyOpen;
+            offenders.push({
+              salon: 'salon2',
+              detail: `S1 ${prevOcc}/${prevCap} (≤80%), libre ${freePrev}; S2 x=${x} → x+5=${x+5} cabía en S1`
+            });
+          }
+        }
+      }
+
+      if (!s3OnlyCelebr && salonOpen.salon3) {
+        const hasS2NonCeleb = comp.salon2.nonCelebr > 0;
+        const hasS1NonCeleb = comp.salon1.nonCelebr > 0;
+
+        const prevSalonKey = hasS2NonCeleb ? 'salon2' : (hasS1NonCeleb ? 'salon1' : null);
+        if (prevSalonKey) {
+          const prevCap = prevSalonKey === 'salon2' ? cap2 : cap1;
+          const prevOcc = paxBySalon[prevSalonKey];
+          const prev80  = 0.8 * prevCap;
+
+          const x = paxBySalon.salon3;
+          const freePrev = Math.max(0, prevCap - prevOcc);
+
+          const condition80 = prevOcc <= prev80;
+          const conditionFit = freePrev >= (x + 5);
+
+          if (condition80 && conditionFit) {
+            penalty += PENALTIES.salonEarlyOpen;
+            offenders.push({
+              salon: 'salon3',
+              detail: `Previo ${prevSalonKey.toUpperCase()} ${prevOcc}/${prevCap} (≤80%), libre ${freePrev}; S3 x=${x} → x+5=${x+5}`
+            });
+          }
+        }
+      }
+
+      return { penalty, offenders };
+    }
 
     /*************************
-     * NUEVO: Comprobación Celebraciones mezcladas en salones
+     * Celebraciones mezcladas en salones (ya incluido)
      *************************/
     function celebrationMixedSalonPenalty(assign) {
-      // Construimos mesas por reserva
       const tablesByReservation = new Map();
       for (const [tid, rid] of assign.entries()) {
         if (!rid) continue;
@@ -814,7 +819,6 @@ function salonEarlyOpenPenalty(assign) {
         tablesByReservation.get(rid).push(t);
       }
 
-      // Por salón, qué reservas hay y si son celebración
       const reservationsInSalon = { salon1: new Set(), salon2: new Set(), salon3: new Set() };
       for (const [rid, tables] of tablesByReservation.entries()) {
         const zones = new Set(tables.map(t => t.zone));
@@ -828,7 +832,7 @@ function salonEarlyOpenPenalty(assign) {
       const celebrationById = new Map(state.reservations.map(r => [r.id, r.celebration || 'no']));
 
       let penalty = 0;
-      const offenders = []; // {salon, reservaId}
+      const offenders = [];
 
       for (const salon of SALON_KEYS) {
         const rids = [...reservationsInSalon[salon]];
@@ -836,7 +840,6 @@ function salonEarlyOpenPenalty(assign) {
         const hasCeleb = rids.some(id => celebrationById.get(id) === 'si');
         const hasNonCeleb = rids.some(id => celebrationById.get(id) !== 'si');
         if (hasCeleb && hasNonCeleb) {
-          // Penalizamos cada reserva de celebración en ese salón
           for (const rid of rids) {
             if (celebrationById.get(rid) === 'si') {
               penalty += PENALTIES.celebrationMixedSalon;
@@ -847,6 +850,44 @@ function salonEarlyOpenPenalty(assign) {
       }
 
       return { penalty, offenders, tablesByReservation };
+    }
+
+    /*************************
+     * NUEVA RESTRICCIÓN: mesa preferida exacta dentro de un salón
+     *************************/
+    function exactPreferredTablePenalty(assign) {
+      // Mapear mesas por reserva
+      const tablesByReservation = new Map();
+      for (const [tid, rid] of assign.entries()) {
+        if (!rid) continue;
+        const t = tableById.get(tid);
+        if (!t) continue;
+        if (!tablesByReservation.has(rid)) tablesByReservation.set(rid, []);
+        tablesByReservation.get(rid).push(t);
+      }
+
+      let penalty = 0;
+      const offenders = [];
+
+      for (const r of state.reservations) {
+        const wantSalon = r.prefSalon || 'ninguno';
+        const wantTableId = r.prefTableId || null;
+
+        // Solo penalizamos cuando hay mesa concreta pedida de un salón concreto
+        if (wantSalon !== 'ninguno' && wantTableId) {
+          const used = tablesByReservation.get(r.id) || [];
+          const ids = new Set(used.map(t => t.id));
+          if (!ids.has(Number(wantTableId))) {
+            penalty += PENALTIES.exactPreferredTable;
+            offenders.push({
+              reservaId: r.id,
+              mesaId: wantTableId
+            });
+          }
+        }
+      }
+
+      return { penalty, offenders };
     }
 
     /*************************
@@ -921,9 +962,12 @@ function salonEarlyOpenPenalty(assign) {
       const salonCheck = salonEarlyOpenPenalty(assign);
       s += salonCheck.penalty;
 
-      // NUEVO: Celebraciones mezcladas en salones
       const celebCheck = celebrationMixedSalonPenalty(assign);
       s += celebCheck.penalty;
+
+      // NUEVO: penalización por no respetar mesa concreta pedida
+      const exactPref = exactPreferredTablePenalty(assign);
+      s += exactPref.penalty;
 
       return s;
     }
@@ -1048,16 +1092,24 @@ function salonEarlyOpenPenalty(assign) {
         }
       }
 
-      // NUEVO: detalle de Celebraciones mezcladas
       const celeb = celebrationMixedSalonPenalty(assign);
       if (celeb.penalty > 0) {
         for (const off of celeb.offenders) {
-          // Intentamos asociar a una mesa usada por esa reserva en ese salón para ubicar la penalización
           let mesaAssoc = null;
           const used = celeb.tablesByReservation.get(off.reservaId) || [];
           mesaAssoc = used.find(t => t.zone === off.salon) || used[0] || null;
           add(mesaAssoc, 'celebrationMixedSalon', PENALTIES.celebrationMixedSalon,
               `Reserva de celebración en ${off.salon} mezclada con reservas que no son celebración`, off.reservaId);
+        }
+      }
+
+      // NUEVO: detalle de mesa exacta preferida
+      const exact = exactPreferredTablePenalty(assign);
+      if (exact.penalty > 0) {
+        for (const off of exact.offenders) {
+          const mesa = tableById.get(Number(off.mesaId)) || null;
+          add(mesa, 'exactPreferredTable', PENALTIES.exactPreferredTable,
+              `No se respetó la mesa preferida (${mesa ? mesa.name : 'ID ' + off.mesaId})`, off.reservaId);
         }
       }
 
@@ -1095,7 +1147,6 @@ function salonEarlyOpenPenalty(assign) {
       return repairAssignment(assign);
     }
 
-    // Vecindario para el "Mejorado"
     function neighborProposal(assign) {
       let next = new Map(assign);
       const tableIds = TABLES.map(t => t.id);
@@ -1138,80 +1189,6 @@ function salonEarlyOpenPenalty(assign) {
         }
       }
       return repairAssignment(next);
-    }
-
-    /* ===========================
-       2-OPT (descenso rápido)
-       =========================== */
-
-    // Conjunto caliente de mesas desde penalizaciones y vecinas
-    function hotTablesFrom(assign, maxHot = 80) {
-      const { penalties } = scoreWithPenalties(assign);
-      const hot = new Set();
-      for (const p of penalties) if (p.mesaId) hot.add(p.mesaId);
-
-      // expandimos con vecinas
-      for (const tid of [...hot]) {
-        const neigh = adjacencyById.get(tid);
-        if (!neigh) continue;
-        for (const nb of neigh) hot.add(nb);
-      }
-      // muestreo si hay demasiadas
-      const list = [...hot];
-      if (list.length <= maxHot) return list;
-
-      const step = Math.max(1, Math.floor(list.length / maxHot));
-      const sampled = [];
-      for (let i = 0; i < list.length && sampled.length < maxHot; i += step) sampled.push(list[i]);
-      return sampled;
-    }
-
-    function swapTables(assign, aId, bId) {
-      const next = new Map(assign);
-      const A = next.get(aId);
-      const B = next.get(bId);
-      next.set(aId, B);
-      next.set(bId, A);
-      return next;
-    }
-
-    async function twoOptDescent(initialAssign, { maxPasses = 4, yieldEvery = 300 } = {}) {
-      let current = new Map(initialAssign);
-      let currentScore = score(current);
-
-      for (let pass = 1; pass <= maxPasses; pass++) {
-        const hot = hotTablesFrom(current);
-        if (hot.length < 2) break;
-
-        let improved = false;
-        let checks = 0;
-
-        for (let i = 0; i < hot.length; i++) {
-          for (let j = i + 1; j < hot.length; j++) {
-            const a = hot[i], b = hot[j];
-            const cand = swapTables(current, a, b);
-            const candScore = score(cand);
-            checks++;
-
-            if (candScore < currentScore) {
-              current = cand;
-              currentScore = candScore;
-              improved = true;
-              i = hot.length; // romper loops para reiniciar pasada (first-improvement)
-              break;
-            }
-
-            if (checks % yieldEvery === 0) {
-              await new Promise(r => setTimeout(r, 0));
-            }
-          }
-        }
-
-        if (!improved) break;
-        await new Promise(r => setTimeout(r, 0));
-      }
-
-      return current;
     }
 
     // === Montecarlo Mejorado
@@ -1289,25 +1266,18 @@ function salonEarlyOpenPenalty(assign) {
       elChartCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
-    // (Se mantiene el código 2-opt por si lo quieres recuperar, pero ya no aparece en el selector)
-
-    // Botón principal: ejecuta según selector (solo Básico o Mejorado)
-    elCalc.addEventListener('click', () => {
-      clearPenaltiesUI(); // limpia tarjetas previas
+    // Botón principal
+    document.getElementById('calcBtn').addEventListener('click', () => {
+      clearPenaltiesUI();
       const algo = elAlgo.value;
-      if (algo === 'basic') {
-        runMonteCarloBasic(500000);
-      } else {
-        // 'improved'
-        runMonteCarloImproved(500000);
-      }
+      if (algo === 'basic') runMonteCarloBasic(500000);
+      else runMonteCarloImproved(500000);
     });
 
     /*************************
      * Render de mesas por zona
      *************************/
     function renderTables(assign = state.assignment) {
-      const elBestScore = document.getElementById('bestScore');
       byZone.terraza.innerHTML = '';
       byZone.salon1.innerHTML = '';
       byZone.salon2.innerHTML = '';
@@ -1419,7 +1389,7 @@ function salonEarlyOpenPenalty(assign) {
           const items = byType.get(t);
           const pts = items.reduce((a,b)=>a+b.puntos, 0);
 
-        const box = document.createElement('div');
+          const box = document.createElement('div');
           box.className = 'pen-box';
           box.innerHTML = `<h4>${TYPE_LABEL[t] || t} <span class="pts">${pts}</span></h4>`;
 
@@ -1445,19 +1415,43 @@ function salonEarlyOpenPenalty(assign) {
       elPenCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
+    /*************************
+     * Formulario: guardar y render listado
+     *************************/
     elSave.onclick = () => {
       const name = (elName.value || '').trim();
       const pax = parseInt(elPax.value, 10);
       if (!name) return alert('Introduce un nombre');
       if (!Number.isFinite(pax) || pax < 1) return alert('Introduce un número de personas válido');
 
-      const r = { id: Date.now(), name, pax, terrace: elTerrace.value, kids: elKids.value, celebration: elCelebration.value };
+      // Preferencia elegida
+      const prefSalon = elPrefSalon.value; // 'ninguno' | 'salon1' | 'salon2' | 'salon3'
+      const prefTableId = elPrefTable.value ? Number(elPrefTable.value) : null;
+
+      // Si el salón es "ninguno", ignoramos la mesa
+      const storedPrefTableId = (prefSalon === 'ninguno') ? null : prefTableId;
+
+      const r = {
+        id: Date.now(),
+        name,
+        pax,
+        terrace: elTerrace.value,
+        kids: elKids.value,
+        celebration: elCelebration.value,
+        prefSalon,
+        prefTableId: storedPrefTableId
+      };
+
       state.reservations.push(r);
       saveReservationsToStorage(state.reservations);
       renderReservations();
 
+      // Reset form
       elName.value=''; elPax.value='';
       elTerrace.value='no'; elKids.value='no'; elCelebration.value='no';
+      elPrefSalon.value='ninguno';
+      refreshPrefTableOptions(); // limpia select de mesa
+      elPrefTable.value='';
 
       if (elBestScore) elBestScore.textContent = '—';
       state.assignment = new Map(TABLES.map(t=>[t.id,null]));
@@ -1478,16 +1472,27 @@ function salonEarlyOpenPenalty(assign) {
       state.reservations.forEach(r=>{
         const row = document.createElement('div');
         row.className='res-row';
+
+        // Texto preferencia
+        let prefTxt = '—';
+        if (r.prefSalon && r.prefSalon !== 'ninguno') {
+          const mesa = r.prefTableId ? tableById.get(Number(r.prefTableId)) : null;
+          const salonNum = r.prefSalon.replace('salon','');
+          prefTxt = `Salón ${salonNum}${mesa ? ' · ' + mesa.name : ''}`;
+        }
+
         row.innerHTML=`
           <div>${escapeHtml(r.name)}</div>
           <div>${r.pax}</div>
           <div>${r.terrace === 'si' ? 'Sí' : 'No'}</div>
           <div>${r.kids === 'si' ? '<span class="tag kids">Sí</span>' : '<span class="tag nokids">No</span>'}</div>
           <div>${r.celebration === 'si' ? '<span class="tag celebr">Sí 🎉</span>' : 'No'}</div>
+          <div>${prefTxt}</div>
           <div><button class="danger" onclick="deleteRes(${r.id})">Eliminar</button></div>`;
         elList.appendChild(row);
       });
     }
+
     window.deleteRes=id=>{
       state.reservations=state.reservations.filter(x=>x.id!==id);
       saveReservationsToStorage(state.reservations);
@@ -1501,15 +1506,51 @@ function salonEarlyOpenPenalty(assign) {
     function escapeHtml(s){ return String(s).replace(/[&<>"']/g, m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m])); }
 
     /*************************
+     * Pref: opciones de mesa por salón
+     *************************/
+    function refreshPrefTableOptions() {
+      const salon = elPrefSalon.value;
+      elPrefTable.innerHTML = '';
+      if (salon === 'ninguno') {
+        const opt = document.createElement('option');
+        opt.value = '';
+        opt.textContent = '— Selecciona salón —';
+        elPrefTable.appendChild(opt);
+        elPrefTable.disabled = true;
+        return;
+      }
+      elPrefTable.disabled = false;
+      const list = zones[salon] || [];
+      const placeholder = document.createElement('option');
+      placeholder.value = '';
+      placeholder.textContent = '— Selecciona mesa —';
+      elPrefTable.appendChild(placeholder);
+      for (const t of list) {
+        const opt = document.createElement('option');
+        opt.value = String(t.id);
+        opt.textContent = t.name;
+        elPrefTable.appendChild(opt);
+      }
+    }
+
+    elPrefSalon.addEventListener('change', refreshPrefTableOptions);
+
+    /*************************
      * INIT
      *************************/
     (function init(){
       state.reservations = loadReservationsFromStorage();
-      // Backfill posible para reservas antiguas sin campo celebration
-      state.reservations = state.reservations.map(r => ({ ...r, celebration: r.celebration || 'no' }));
+      // Backfill campos nuevos
+      state.reservations = state.reservations.map(r => ({
+        ...r,
+        celebration: r.celebration || 'no',
+        prefSalon: r.prefSalon || 'ninguno',
+        prefTableId: r.prefSalon && r.prefSalon !== 'ninguno' ? (r.prefTableId ?? null) : null
+      }));
       renderReservations();
       renderTables();
       clearPenaltiesUI();
+      refreshPrefTableOptions();
     })();
   </script>
 </body>
