@@ -6,7 +6,7 @@
   <title>Asignación de Mesas — Optimización Montecarlo</title>
   <style>
     :root {
-      --bg: #f5f5dc;          /* beige */
+      --bg: #f5f5dc;
       --panel: #ffffff;
       --muted: #444;
       --text: #111;
@@ -17,166 +17,52 @@
       --chip: #e0e0e0;
       --chip-terrace: #b2dfdb;
     }
-
     * { box-sizing: border-box; }
-
     body {
-      margin: 0;
-      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      padding: 24px;
-      font-size: 18px;
+      margin: 0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg); color: var(--text); padding: 24px; font-size: 18px;
     }
-
     h1 { margin: 0 0 12px; font-size: 24px; }
     h2 { font-size: 20px; margin: 0 0 8px; color: var(--muted); font-weight: 600; }
-
-    .app {
-      max-width: 1300px;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: 1.05fr 1fr;
-      gap: 20px;
-    }
-
-    .card {
-      background: #fff8f0;
-      border: 2px solid #ddd;
-      border-radius: 14px;
-      padding: 16px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-    }
-
+    .app { max-width: 1300px; margin: 0 auto; display: grid; grid-template-columns: 1.05fr 1fr; gap: 20px; }
+    .card { background: #fff8f0; border: 2px solid #ddd; border-radius: 14px; padding: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
     label { font-size: 16px; color: var(--muted); display: block; margin-bottom: 4px; }
-
-    input, select {
-      width: 100%; padding: 10px 12px;
-      border-radius: 10px; border: 1px solid #aaa;
-      font-size: 17px;
-      color: var(--text);
-      background: #fff;
-    }
-
-    button {
-      padding: 10px 14px;
-      border: none;
-      border-radius: 10px;
-      color: white;
-      cursor: pointer;
-      font-weight: 600;
-      font-size: 16px;
-    }
-
+    input, select { width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid #aaa; font-size: 17px; color: var(--text); background: #fff; }
+    button { padding: 10px 14px; border: none; border-radius: 10px; color: white; cursor: pointer; font-weight: 600; font-size: 16px; }
     button.secondary { background: #22c55e; }
     button.danger { background: var(--danger); }
-
-    /* Formulario: ampliamos columnas para incluir preferencia de salón/mesa */
     .form-grid { display:grid; grid-template-columns:1.2fr 0.6fr 0.7fr 0.7fr 0.9fr 1fr 1.2fr auto; gap:10px; }
-
-    /* Listado de reservas: añadimos columna Preferencia */
-    .res-row, .grid-header {
-      display: grid;
-      grid-template-columns: 2fr 0.8fr 0.8fr 0.9fr 0.9fr 1.4fr auto;
-      gap: 10px;
-      align-items: center;
-      padding: 10px;
-    }
-
-    .grid-header {
-      font-weight: bold;
-      border-bottom: 2px solid #ddd;
-      background: #f0e7da;
-    }
-
-    .tag {
-      display: inline-block;
-      padding: 4px 8px;
-      border-radius: 6px;
-      background: #eee;
-      font-size: 15px;
-    }
+    .res-row, .grid-header { display: grid; grid-template-columns: 2fr 0.8fr 0.8fr 0.9fr 0.9fr 1.4fr auto; gap: 10px; align-items: center; padding: 10px; }
+    .grid-header { font-weight: bold; border-bottom: 2px solid #ddd; background: #f0e7da; }
+    .tag { display: inline-block; padding: 4px 8px; border-radius: 6px; background: #eee; font-size: 15px; }
     .tag.kids { background: #e0f2f1; }
     .tag.nokids { background: #eceff1; }
     .tag.celebr { background: #fde68a; }
-
-    .zones {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 14px;
-      margin-top: 10px;
-    }
-
+    .zones { display: grid; grid-template-columns: 1fr; gap: 14px; margin-top: 10px; }
     .zone-title { font-weight: 700; color: #333; margin-top: 4px; }
-
-    .tables {
-      display: grid;
-      grid-template-columns: repeat(6, minmax(140px, 1fr));
-      gap: 12px;
-      margin-top: 10px;
-    }
-
-    .table-tile {
-      border: 1px solid #bbb;
-      border-radius: 12px;
-      padding: 10px;
-      min-height: 96px;
-      background: #fff;
-    }
-
-    .badge {
-      font-size: 12px;
-      float: right;
-      background: #b2dfdb;
-      padding: 4px 8px;
-      border-radius: 6px;
-    }
+    .tables { display: grid; grid-template-columns: repeat(6, minmax(140px, 1fr)); gap: 12px; margin-top: 10px; }
+    .table-tile { border: 1px solid #bbb; border-radius: 12px; padding: 10px; min-height: 96px; background: #fff; }
+    .badge { font-size: 12px; float: right; background: #b2dfdb; padding: 4px 8px; border-radius: 6px; }
     .cap { font-size: 12px; color: #555; }
-
     .note { color: var(--muted); font-size: 15px; }
-
-    .summary {
-      margin: 12px 0 4px;
-      padding: 10px 12px;
-      border: 1px dashed #bbb;
-      border-radius: 10px;
-      background: #fff;
-      font-size: 17px;
-    }
-
-    /* === Tarjeta de Penalizaciones === */
+    .summary { margin: 12px 0 4px; padding: 10px 12px; border: 1px dashed #bbb; border-radius: 10px; background: #fff; font-size: 17px; }
     #penaltiesCard { grid-column: 1 / -1; }
-    .pen-header {
-      display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:10px;
-    }
+    .pen-header { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:10px; }
     .pen-total { text-align:right; }
     .pen-total .label { font-size:12px; color:#666; text-transform:uppercase; }
     .pen-total .value { font-size:26px; font-weight:800; }
-    .pen-mesa {
-      border:1px solid #ddd; border-radius:12px; padding:10px; background:#fff; margin-bottom:10px;
-    }
-    .pen-mesa-head {
-      display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;
-    }
-    .chip {
-      display:inline-block; padding:4px 8px; border-radius:999px; background:#eef2ff; font-size:12px; margin-right:6px;
-    }
-    .pen-grid {
-      display:grid; grid-template-columns: repeat(3, minmax(220px, 1fr)); gap:10px;
-    }
-    .pen-box {
-      border:1px solid #eee; border-radius:10px; padding:8px; background:#fafafa;
-    }
+    .pen-mesa { border:1px solid #ddd; border-radius:12px; padding:10px; background:#fff; margin-bottom:10px; }
+    .pen-mesa-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; }
+    .chip { display:inline-block; padding:4px 8px; border-radius:999px; background:#eef2ff; font-size:12px; margin-right:6px; }
+    .pen-grid { display:grid; grid-template-columns: repeat(3, minmax(220px, 1fr)); gap:10px; }
+    .pen-box { border:1px solid #eee; border-radius:10px; padding:8px; background:#fafafa; }
     .pen-box h4 { margin:0 0 4px; font-size:14px; }
     .pen-box .pts { font-weight:700; float:right; }
     .pen-list { margin:0; padding-left:18px; }
     .pen-list li { font-size:13px; margin:3px 0; }
-
-    /* === Tarjeta Gráfico === */
     #chartCard { grid-column: 1 / -1; display:none; }
     #chartHeader { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:6px; }
     #chartCanvas { width:100%; height:260px; display:block; }
-
     @media (max-width: 1100px) {
       .app { grid-template-columns: 1fr; }
       .tables { grid-template-columns: repeat(3, minmax(140px, 1fr)); }
@@ -186,7 +72,7 @@
 </head>
 <body>
   <div class="app">
-    <!-- Columna izquierda: formulario + reservas -->
+    <!-- Columna izquierda -->
     <section class="card">
       <h1>Gestión de reservas</h1>
       <div class="form-grid">
@@ -198,8 +84,6 @@
           <select id="kids"><option value="no">No</option><option value="si">Sí</option></select></div>
         <div><label>¿Celebración?</label>
           <select id="celebration"><option value="no">No</option><option value="si">Sí</option></select></div>
-
-        <!-- NUEVOS CAMPOS -->
         <div>
           <label>Salón preferido</label>
           <select id="prefSalon">
@@ -215,7 +99,6 @@
             <option value="">— Selecciona salón —</option>
           </select>
         </div>
-
         <button id="saveBtn" class="secondary">Guardar</button>
       </div>
 
@@ -226,18 +109,17 @@
       <div id="reservationsList"></div>
     </section>
 
-    <!-- Columna derecha: cálculo + mesas -->
+    <!-- Columna derecha -->
     <section class="card">
       <div style="display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap">
         <h1>Asignación de mesas</h1>
         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-          <!-- Selector de algoritmo (sin 2-opt) -->
           <label for="algoSelect" style="margin:0;font-weight:600;color:#333">Algoritmo</label>
           <select id="algoSelect" style="width:auto">
             <option value="basic">Montecarlo — Básico</option>
             <option value="improved" selected>Montecarlo — Mejorado</option>
           </select>
-          <button id="calcBtn" class="secondary">Calcular asignación (500.000 iter.)</button>
+          <button id="calcBtn" class="secondary">Calcular asignación (150.000 iter.)</button>
         </div>
       </div>
 
@@ -246,1247 +128,734 @@
         <span id="bestScore">—</span>
       </div>
 
-      <!-- Zonas: Terraza + Salones -->
       <div class="zones">
-        <div>
-          <div class="zone-title">Terraza</div>
-          <div id="tables_terraza" class="tables"></div>
-        </div>
-        <div>
-          <div class="zone-title">Salón 1</div>
-          <div id="tables_salon1" class="tables"></div>
-        </div>
-        <div>
-          <div class="zone-title">Salón 2</div>
-          <div id="tables_salon2" class="tables"></div>
-        </div>
-        <div>
-          <div class="zone-title">Salón 3</div>
-          <div id="tables_salon3" class="tables"></div>
-        </div>
+        <div><div class="zone-title">Terraza</div><div id="tables_terraza" class="tables"></div></div>
+        <div><div class="zone-title">Salón 1</div><div id="tables_salon1" class="tables"></div></div>
+        <div><div class="zone-title">Salón 2</div><div id="tables_salon2" class="tables"></div></div>
+        <div><div class="zone-title">Salón 3</div><div id="tables_salon3" class="tables"></div></div>
       </div>
     </section>
 
-    <!-- Tarjeta 3: Penalizaciones por mesa -->
+    <!-- Penalizaciones -->
     <section id="penaltiesCard" class="card" style="display:none">
       <div class="pen-header">
         <div>
           <h1>Penalizaciones aplicadas por mesa</h1>
           <div class="note">Desglose de restricciones incumplidas y puntos por mesa. Incluye huecos en divisiones (200 por asiento libre).</div>
         </div>
-        <div class="pen-total">
-          <div class="label">Total</div>
-          <div id="penTotal" class="value">0</div>
-        </div>
+        <div class="pen-total"><div class="label">Total</div><div id="penTotal" class="value">0</div></div>
       </div>
       <div id="penaltiesBody"></div>
     </section>
 
-    <!-- Tarjeta 4: Gráfico convergencia Montecarlo -->
+    <!-- Gráfico -->
     <section id="chartCard" class="card">
-      <div id="chartHeader">
-        <h1>Evolución de “suma de restricciones”</h1>
-        <div class="note" id="chartMeta">—</div>
-      </div>
+      <div id="chartHeader"><h1>Evolución de “suma de restricciones”</h1><div class="note" id="chartMeta">—</div></div>
       <canvas id="chartCanvas"></canvas>
     </section>
   </div>
 
   <script>
-    /*************************
-     * Persistencia (localStorage)
-     *************************/
     const STORAGE_KEYS = { reservations: 'am_reservations_v1' };
-
-    function saveReservationsToStorage(list) {
-      try { localStorage.setItem(STORAGE_KEYS.reservations, JSON.stringify(list || [])); }
-      catch (e) { console.warn('No se pudieron guardar las reservas en localStorage:', e); }
+    function saveReservationsToStorage(list){ try{ localStorage.setItem(STORAGE_KEYS.reservations, JSON.stringify(list||[])); }catch(e){} }
+    function loadReservationsFromStorage(){
+      try{ const raw=localStorage.getItem(STORAGE_KEYS.reservations); if(!raw) return [];
+        const arr=JSON.parse(raw); return Array.isArray(arr)?arr.filter(x=>x&&typeof x.id==='number'&&typeof x.name==='string'):[]; }catch(e){ return []; }
     }
 
-    function loadReservationsFromStorage() {
-      try {
-        const raw = localStorage.getItem(STORAGE_KEYS.reservations);
-        if (!raw) return [];
-        const arr = JSON.parse(raw);
-        return Array.isArray(arr) ? arr.filter(x => x && typeof x.id === 'number' && typeof x.name === 'string') : [];
-      } catch (e) {
-        console.warn('No se pudieron cargar las reservas desde localStorage:', e);
-        return [];
-      }
-    }
-
-    /*************************
-     * Definición de mesas (rangos 2–4, 4–6, 6–9) + CONTIGÜIDAD EN MALLA (8 direcciones)
-     *************************/
-    function buildTables() {
-      let id = 1;
-      const zones = { terraza: [], salon1: [], salon2: [], salon3: [] };
-
-      function pushMany(arr, qty, minCap, maxCap, labelPrefix) {
-        for (let i = 0; i < qty; i++) {
-          arr.push({
-            id: id++,
-            zone: labelPrefix,
-            terrace: labelPrefix === 'terraza',
-            minCap,
-            maxCap,
-            pos: arr.length,
-            name: `${labelPrefix === 'terraza' ? 'T' : labelPrefix === 'salon1' ? 'S1' : labelPrefix === 'salon2' ? 'S2' : 'S3'}-${String(arr.length + 1).padStart(2,'0')}`
-          });
+    function buildTables(){
+      let id=1;
+      const zones={ terraza:[], salon1:[], salon2:[], salon3:[] };
+      function pushMany(arr, qty, minCap, maxCap, labelPrefix){
+        for(let i=0;i<qty;i++){
+          arr.push({ id:id++, zone:labelPrefix, terrace:labelPrefix==='terraza', minCap, maxCap, pos:arr.length,
+            name:`${labelPrefix==='terraza'?'T':labelPrefix==='salon1'?'S1':labelPrefix==='salon2'?'S2':'S3'}-${String(arr.length+1).padStart(2,'0')}` });
         }
       }
-
       // Terraza
-      pushMany(zones.terraza, 17, 2, 4, 'terraza');
-      pushMany(zones.terraza,  9, 4, 6, 'terraza');
-      pushMany(zones.terraza,  1, 6, 9, 'terraza');
-
+      pushMany(zones.terraza,17,2,4,'terraza'); pushMany(zones.terraza,9,4,6,'terraza'); pushMany(zones.terraza,1,6,9,'terraza');
       // Salón 1
-      pushMany(zones.salon1, 4, 2, 4, 'salon1');
-      pushMany(zones.salon1, 4, 4, 6, 'salon1');
-      pushMany(zones.salon1, 2, 6, 9, 'salon1');
-
+      pushMany(zones.salon1,4,2,4,'salon1'); pushMany(zones.salon1,4,4,6,'salon1'); pushMany(zones.salon1,2,6,9,'salon1');
       // Salón 2
-      pushMany(zones.salon2, 4, 2, 4, 'salon2');
-      pushMany(zones.salon2, 2, 4, 6, 'salon2');
-      pushMany(zones.salon2, 3, 6, 9, 'salon2');
-
+      pushMany(zones.salon2,4,2,4,'salon2'); pushMany(zones.salon2,2,4,6,'salon2'); pushMany(zones.salon2,3,6,9,'salon2');
       // Salón 3
-      pushMany(zones.salon3, 1, 2, 4, 'salon3');
-      pushMany(zones.salon3, 3, 4, 6, 'salon3');
-      pushMany(zones.salon3, 3, 6, 9, 'salon3');
+      pushMany(zones.salon3,1,2,4,'salon3'); pushMany(zones.salon3,3,4,6,'salon3'); pushMany(zones.salon3,3,6,9,'salon3');
 
-      const TABLES = [
-        ...zones.terraza, ...zones.salon1, ...zones.salon2, ...zones.salon3,
-      ];
+      const TABLES=[...zones.terraza,...zones.salon1,...zones.salon2,...zones.salon3];
+      const GRID_COLS={ terraza:6, salon1:5, salon2:5, salon3:4 };
 
-      // Malla: columnas por zona
-      const GRID_COLS = { terraza: 6, salon1: 5, salon2: 5, salon3: 4 };
-
-      const adjacencyPairs = [];
-      const adjacencyById = new Map();
-
-      const addEdge = (a, b) => {
-        if (!a || !b) return;
-        if (!adjacencyById.has(a)) adjacencyById.set(a, new Set());
-        if (!adjacencyById.has(b)) adjacencyById.set(b, new Set());
-        if (!adjacencyById.get(a).has(b)) { adjacencyById.get(a).add(b); adjacencyPairs.push([a, b]); }
-        if (!adjacencyById.get(b).has(a)) { adjacencyById.get(b).add(a); adjacencyPairs.push([b, a]); }
+      const adjacencyPairs=[]; const adjacencyById=new Map();
+      const addEdge=(a,b)=>{ if(!a||!b) return;
+        if(!adjacencyById.has(a)) adjacencyById.set(a,new Set());
+        if(!adjacencyById.has(b)) adjacencyById.set(b,new Set());
+        if(!adjacencyById.get(a).has(b)){ adjacencyById.get(a).add(b); adjacencyPairs.push([a,b]); }
+        if(!adjacencyById.get(b).has(a)){ adjacencyById.get(b).add(a); adjacencyPairs.push([b,a]); }
       };
 
-      for (const zoneKey of Object.keys(zones)) {
-        const arr = zones[zoneKey];
-        const cols = GRID_COLS[zoneKey] || 3;
-
-        for (let i = 0; i < arr.length; i++) {
-          const t = arr[i];
-          const row = Math.floor(i / cols);
-          const col = i % cols;
-
-        for (let dr = -1; dr <= 1; dr++) {
-            for (let dc = -1; dc <= 1; dc++) {
-              if (dr === 0 && dc === 0) continue;
-              const nr = row + dr, nc = col + dc;
-              if (nr < 0 || nc < 0) continue;
-              const idx = nr * cols + nc;
-              if (nc >= cols || idx >= arr.length) continue;
-              const neighbor = arr[idx];
-              if (neighbor) addEdge(t.id, neighbor.id);
+      for(const zoneKey of Object.keys(zones)){
+        const arr=zones[zoneKey]; const cols=GRID_COLS[zoneKey]||3;
+        for(let i=0;i<arr.length;i++){
+          const t=arr[i]; const row=Math.floor(i/cols); const col=i%cols;
+          for(let dr=-1;dr<=1;dr++){
+            for(let dc=-1;dc<=1;dc++){
+              if(dr===0 && dc===0) continue;
+              const nr=row+dr, nc=col+dc; if(nr<0||nc<0) continue; const idx=nr*cols+nc;
+              if(nc>=cols||idx>=arr.length) continue; const neighbor=arr[idx]; if(neighbor) addEdge(t.id,neighbor.id);
             }
           }
         }
       }
 
-      const tableById = new Map(TABLES.map(t => [t.id, t]));
+      const tableById=new Map(TABLES.map(t=>[t.id,t]));
       return { TABLES, adjacencyPairs, adjacencyById, tableById, GRID_COLS, zones };
     }
-
     const { TABLES, adjacencyPairs, adjacencyById, tableById, zones } = buildTables();
 
-    // === Capacidad por zona (sumando maxCap) para la regla de “salones por escalado” ===
-    const ZONE_CAPACITY = (() => {
-      const cap = { terraza: 0, salon1: 0, salon2: 0, salon3: 0 };
-      for (const t of TABLES) cap[t.zone] += t.maxCap;
-      return cap;
-    })();
+    const ZONE_CAPACITY = (()=>{ const cap={terraza:0,salon1:0,salon2:0,salon3:0}; for(const t of TABLES) cap[t.zone]+=t.maxCap; return cap; })();
 
-    // Estado global
-    const state = {
-      reservations: [],
-      assignment: new Map(TABLES.map(t => [t.id, null])),
-    };
+    const state={ reservations:[], assignment:new Map(TABLES.map(t=>[t.id,null])) };
 
-    // DOM
-    const elList = document.getElementById('reservationsList');
-    const elName = document.getElementById('name');
-    const elPax = document.getElementById('pax');
-    const elTerrace = document.getElementById('terrace');
-    const elKids = document.getElementById('kids');
-    const elCelebration = document.getElementById('celebration');
-    const elPrefSalon = document.getElementById('prefSalon');
-    const elPrefTable = document.getElementById('prefTable');
+    const elList=document.getElementById('reservationsList');
+    const elName=document.getElementById('name');
+    const elPax=document.getElementById('pax');
+    const elTerrace=document.getElementById('terrace');
+    const elKids=document.getElementById('kids');
+    const elCelebration=document.getElementById('celebration');
+    const elPrefSalon=document.getElementById('prefSalon');
+    const elPrefTable=document.getElementById('prefTable');
 
-    const elSave = document.getElementById('saveBtn');
-    const elCalc = document.getElementById('calcBtn');
-    const elAlgo = document.getElementById('algoSelect');
-    const elBestScore = document.getElementById('bestScore');
-    const byZone = {
-      terraza: document.getElementById('tables_terraza'),
-      salon1: document.getElementById('tables_salon1'),
-      salon2: document.getElementById('tables_salon2'),
-      salon3: document.getElementById('tables_salon3'),
-    };
+    const elSave=document.getElementById('saveBtn');
+    const elCalc=document.getElementById('calcBtn');
+    const elAlgo=document.getElementById('algoSelect');
+    const elBestScore=document.getElementById('bestScore');
+    const byZone={ terraza:document.getElementById('tables_terraza'), salon1:document.getElementById('tables_salon1'), salon2:document.getElementById('tables_salon2'), salon3:document.getElementById('tables_salon3') };
 
-    // Penalizaciones UI
-    const elPenCard = document.getElementById('penaltiesCard');
-    const elPenBody = document.getElementById('penaltiesBody');
-    const elPenTotal = document.getElementById('penTotal');
+    const elPenCard=document.getElementById('penaltiesCard');
+    const elPenBody=document.getElementById('penaltiesBody');
+    const elPenTotal=document.getElementById('penTotal');
 
-    // Gráfico UI
-    const elChartCard = document.getElementById('chartCard');
-    const elChartCanvas = document.getElementById('chartCanvas');
-    const elChartMeta = document.getElementById('chartMeta');
-    const chartCtx = elChartCanvas.getContext('2d', { alpha: false });
+    const elChartCard=document.getElementById('chartCard');
+    const elChartCanvas=document.getElementById('chartCanvas');
+    const elChartMeta=document.getElementById('chartMeta');
+    const chartCtx=elChartCanvas.getContext('2d',{alpha:false});
 
-    /*************************
-     * Utilidades Gráfico simple (canvas)
-     *************************/
-    function fitCanvasToCard() {
-      const ratio = window.devicePixelRatio || 1;
-      const rect = elChartCanvas.getBoundingClientRect();
-      elChartCanvas.width = Math.max(600, rect.width * ratio);
-      elChartCanvas.height = Math.max(220 * ratio, rect.height * ratio);
-      chartCtx.setTransform(ratio, 0, 0, ratio, 0, 0);
+    function fitCanvasToCard(){
+      const ratio=window.devicePixelRatio||1; const rect=elChartCanvas.getBoundingClientRect();
+      elChartCanvas.width=Math.max(600,rect.width*ratio); elChartCanvas.height=Math.max(220*ratio,rect.height*ratio);
+      chartCtx.setTransform(ratio,0,0,ratio,0,0);
+    }
+    let bestHistory=[];
+    function resetChart(){ bestHistory=[]; elChartMeta.textContent='—'; elChartCard.style.display='block'; fitCanvasToCard(); drawChart(); }
+    window.addEventListener('resize', ()=>{ if(elChartCard.style.display!=='none'){ fitCanvasToCard(); drawChart(); }});
+    function drawChart(){
+      const ctx=chartCtx; const W=elChartCanvas.clientWidth; const H=elChartCanvas.clientHeight;
+      ctx.clearRect(0,0,W,H); const m={l:60,r:16,t:16,b:32}; const plotW=W-m.l-m.r; const plotH=H-m.t-m.b;
+      ctx.fillStyle='#ffffff'; ctx.fillRect(0,0,W,H);
+      if(bestHistory.length===0){ ctx.fillStyle='#666'; ctx.font='14px system-ui, sans-serif'; ctx.fillText('Añade reservas y pulsa “Calcular asignación” para ver el gráfico.', m.l, m.t+20); return; }
+      const n=bestHistory.length; const xMin=1,xMax=n; const yMin=Math.min(...bestHistory); const yMax=Math.max(...bestHistory);
+      const pad=Math.max(1,Math.round((yMax-yMin)*0.1)); const y0=yMin-pad; const y1=yMax+pad;
+      const x2px=x=>m.l+((x-xMin)/(xMax-xMin||1))*plotW; const y2px=y=>m.t+plotH-((y-y0)/(y1-y0||1))*plotH;
+      ctx.strokeStyle='#ddd'; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(m.l,m.t+plotH); ctx.lineTo(m.l+plotW,m.t+plotH); ctx.moveTo(m.l,m.t); ctx.lineTo(m.l,m.t+plotH); ctx.stroke();
+      const ticks=5; ctx.fillStyle='#666'; ctx.font='12px system-ui, sans-serif';
+      for(let i=0;i<=ticks;i++){ const tx=1+Math.round(i*(xMax-1)/ticks); const px=x2px(tx); ctx.strokeStyle='#f1eee8'; ctx.beginPath(); ctx.moveTo(px,m.t); ctx.lineTo(px,m.t+plotH); ctx.stroke(); ctx.fillStyle='#666'; ctx.fillText(String(tx), px-6, m.t+plotH+16); }
+      for(let i=0;i<=ticks;i++){ const ty=y0+i*(y1-y0)/ticks; const py=y2px(ty); ctx.strokeStyle='#f1eee8'; ctx.beginPath(); ctx.moveTo(m.l,py); ctx.lineTo(m.l+plotW,py); ctx.stroke(); ctx.fillStyle='#666'; ctx.fillText(Math.round(ty).toString(), 6, py+4); }
+      ctx.lineWidth=2; ctx.strokeStyle='#2563eb'; ctx.beginPath();
+      for(let i=0;i<n;i++){ const x=x2px(i+1), y=y2px(bestHistory[i]); if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y); } ctx.stroke();
+      const xLast=x2px(n), yLast=y2px(bestHistory[n-1]); ctx.fillStyle='#2563eb'; ctx.beginPath(); ctx.arc(xLast,yLast,3,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle='#333'; ctx.font='12px system-ui, sans-serif'; ctx.fillText(`Iter ${n} → ${bestHistory[n-1]}`, Math.min(W-140,xLast+6), Math.max(14,yLast-6));
     }
 
-    let bestHistory = []; // valores y por iteración (x = índice + 1)
-    function resetChart() {
-      bestHistory = [];
-      elChartMeta.textContent = '—';
-      elChartCard.style.display = 'block';
-      fitCanvasToCard();
-      drawChart();
-    }
-
-    window.addEventListener('resize', () => { if (elChartCard.style.display !== 'none') { fitCanvasToCard(); drawChart(); } });
-
-    function drawChart() {
-      const ctx = chartCtx;
-      const W = elChartCanvas.clientWidth;
-      const H = elChartCanvas.clientHeight;
-      ctx.clearRect(0, 0, W, H);
-      const m = { l: 60, r: 16, t: 16, b: 32 };
-      const plotW = W - m.l - m.r;
-      const plotH = H - m.t - m.b;
-
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(0, 0, W, H);
-
-      if (bestHistory.length === 0) {
-        ctx.fillStyle = '#666';
-        ctx.font = '14px system-ui, sans-serif';
-        ctx.fillText('Añade reservas y pulsa “Calcular asignación” para ver el gráfico.', m.l, m.t + 20);
-        return;
-      }
-
-      const n = bestHistory.length;
-      const xMin = 1, xMax = n;
-      const yMin = Math.min(...bestHistory);
-      const yMax = Math.max(...bestHistory);
-      const pad = Math.max(1, Math.round((yMax - yMin) * 0.1));
-      const y0 = yMin - pad;
-      const y1 = yMax + pad;
-
-      const x2px = x => m.l + ( (x - xMin) / (xMax - xMin || 1) ) * plotW;
-      const y2px = y => m.t + plotH - ( (y - y0) / (y1 - y0 || 1) ) * plotH;
-
-      ctx.strokeStyle = '#ddd';
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(m.l, m.t + plotH); ctx.lineTo(m.l + plotW, m.t + plotH);
-      ctx.moveTo(m.l, m.t); ctx.lineTo(m.l, m.t + plotH);
-      ctx.stroke();
-
-      const ticks = 5;
-      ctx.fillStyle = '#666';
-      ctx.font = '12px system-ui, sans-serif';
-      for (let i = 0; i <= ticks; i++) {
-        const tx = 1 + Math.round(i * (xMax - 1) / ticks);
-        const px = x2px(tx);
-        ctx.strokeStyle = '#f1eee8';
-        ctx.beginPath(); ctx.moveTo(px, m.t); ctx.lineTo(px, m.t + plotH); ctx.stroke();
-        ctx.fillStyle = '#666';
-        ctx.fillText(String(tx), px - 6, m.t + plotH + 16);
-      }
-      for (let i = 0; i <= ticks; i++) {
-        const ty = y0 + i * (y1 - y0) / ticks;
-        const py = y2px(ty);
-        ctx.strokeStyle = '#f1eee8';
-        ctx.beginPath(); ctx.moveTo(m.l, py); ctx.lineTo(m.l + plotW, py); ctx.stroke();
-        ctx.fillStyle = '#666';
-        ctx.fillText(Math.round(ty).toString(), 6, py + 4);
-      }
-
-      ctx.lineWidth = 2;
-      ctx.strokeStyle = '#2563eb';
-      ctx.beginPath();
-      for (let i = 0; i < n; i++) {
-        const x = x2px(i + 1);
-        const y = y2px(bestHistory[i]);
-        if (i === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-      }
-      ctx.stroke();
-
-      const xLast = x2px(n);
-      const yLast = y2px(bestHistory[n - 1]);
-      ctx.fillStyle = '#2563eb';
-      ctx.beginPath(); ctx.arc(xLast, yLast, 3, 0, Math.PI * 2); ctx.fill();
-
-      ctx.fillStyle = '#333';
-      ctx.font = '12px system-ui, sans-serif';
-      ctx.fillText(`Iter ${n} → ${bestHistory[n-1]}`, Math.min(W - 140, xLast + 6), Math.max(14, yLast - 6));
-    }
-
-    /*************************
-     * Penalizaciones (añadimos exactPreferredTable)
-     *************************/
     const PENALTIES = {
-      preferenceMismatch: 1000000,
-      kidsConflictAdj: 5000,
-      multiNotSameZone: 50000,
-      multiNotContiguous: 20000,
-      capacityOverflowSingle: 8000,
-      capacityOverflowGroup: 8000,
-      splitSmallGroup: 5000,
-      extraTablesUsed: 7000,
-      multiSeatGaps: 200,
-      unseatedReservation: 40000,
-      salonEarlyOpen: 200000,
-      celebrationMixedSalon: 500000,
-      exactPreferredTable: 1000  // NUEVO
+      preferenceMismatch: 1000000, kidsConflictAdj: 5000, multiNotSameZone: 50000, multiNotContiguous: 20000,
+      capacityOverflowSingle: 8000, capacityOverflowGroup: 8000, splitSmallGroup: 5000, extraTablesUsed: 7000,
+      multiSeatGaps: 200, unseatedReservation: 40000, salonEarlyOpen: 200000, celebrationMixedSalon: 500000,
+      exactPreferredTable: 1000
     };
-
     const TYPE_LABEL = {
-      preferenceMismatch: "Ubicación contraria a preferencia (interior/terraza)",
-      kidsConflictAdj: "Conflicto niños en mesas contiguas",
-      multiNotSameZone: "Reserva repartida entre zonas distintas",
-      multiNotContiguous: "Mesas no contiguas",
-      capacityOverflowSingle: "No cabe en una mesa (overflow)",
-      capacityOverflowGroup: "No cabe en bloque multi-mesa",
-      splitSmallGroup: "Grupo pequeño dividido innecesariamente",
-      extraTablesUsed: "Mesas adicionales sobre el mínimo",
-      multiSeatGaps: "Huecos por división (200/puesto)",
-      unseatedReservation: "Reserva no sentada",
-      salonEarlyOpen: "Apertura prematura de salón",
-      celebrationMixedSalon: "Celebración mezclada con no celebración en salón",
-      exactPreferredTable: "No sentado en mesa preferida del salón" // NUEVO
+      preferenceMismatch:"Ubicación contraria a preferencia (interior/terraza)", kidsConflictAdj:"Conflicto niños en mesas contiguas",
+      multiNotSameZone:"Reserva repartida entre zonas distintas", multiNotContiguous:"Mesas no contiguas",
+      capacityOverflowSingle:"No cabe en una mesa (overflow)", capacityOverflowGroup:"No cabe en bloque multi-mesa",
+      splitSmallGroup:"Grupo pequeño dividido innecesariamente", extraTablesUsed:"Mesas adicionales sobre el mínimo",
+      multiSeatGaps:"Huecos por división (200/puesto)", unseatedReservation:"Reserva no sentada",
+      salonEarlyOpen:"Apertura prematura de salón", celebrationMixedSalon:"Celebración mezclada con no celebración en salón",
+      exactPreferredTable:"No sentado en mesa preferida del salón"
     };
 
-    /*************************
-     * Helper: mínimo de mesas necesarias (maxCaps: 9,6,4)
-     *************************/
-    function minTablesNeededForPax(pax) {
-      let best = Math.ceil(pax / 4);
-      const max9 = Math.ceil(pax / 9) + 1;
-      for (let a9 = 0; a9 <= max9; a9++) {
-        const cap9 = 9 * a9;
-        const rem1 = Math.max(0, pax - cap9);
-        const max6 = Math.ceil(rem1 / 6) + 1;
-        for (let a6 = 0; a6 <= max6; a6++) {
-          const cap96 = cap9 + 6 * a6;
-          const rem2 = Math.max(0, pax - cap96);
-          const a4 = Math.ceil(rem2 / 4);
-          const totalTables = a9 + a6 + a4;
-          if (totalTables < best) best = totalTables;
-          if (a9 + a6 >= best) break;
+    function minTablesNeededForPax(pax){
+      let best=Math.ceil(pax/4); const max9=Math.ceil(pax/9)+1;
+      for(let a9=0;a9<=max9;a9++){
+        const cap9=9*a9; const rem1=Math.max(0,pax-cap9); const max6=Math.ceil(rem1/6)+1;
+        for(let a6=0;a6<=max6;a6++){
+          const cap96=cap9+6*a6; const rem2=Math.max(0,pax-cap96); const a4=Math.ceil(rem2/4);
+          const total=a9+a6+a4; if(total<best) best=total; if(a9+a6>=best) break;
         }
-        if (a9 >= best) break;
+        if(a9>=best) break;
       }
       return best;
     }
 
-    /*************************
-     * Helpers de reparación / cobertura
-     *************************/
-    function seatedReservationIds(assign) {
-      const set = new Set();
-      for (const rid of assign.values()) if (rid) set.add(rid);
-      return set;
-    }
-    function unseatedReservationIds(assign) {
-      const seated = seatedReservationIds(assign);
-      const out = [];
-      for (const r of state.reservations) if (!seated.has(r.id)) out.push(r.id);
-      return out;
-    }
-    function repairAssignment(assign) {
-      const next = new Map(assign);
-      const seen = new Set();
-
-      let unseated = unseatedReservationIds(next);
-      for (const [tid, rid] of next.entries()) {
-        if (!rid) continue;
-        if (seen.has(rid)) {
-          if (unseated.length) next.set(tid, unseated.pop());
-        } else {
-          seen.add(rid);
-        }
+    function seatedReservationIds(assign){ const set=new Set(); for(const rid of assign.values()) if(rid) set.add(rid); return set; }
+    function unseatedReservationIds(assign){ const seated=seatedReservationIds(assign); const out=[]; for(const r of state.reservations) if(!seated.has(r.id)) out.push(r.id); return out; }
+    function repairAssignment(assign){
+      const next=new Map(assign); const seen=new Set();
+      let unseated=unseatedReservationIds(next);
+      for(const [tid,rid] of next.entries()){
+        if(!rid) continue;
+        if(seen.has(rid)){ if(unseated.length) next.set(tid, unseated.pop()); }
+        else seen.add(rid);
       }
-      unseated = unseatedReservationIds(next);
-      for (const [tid, rid] of next.entries()) {
-        if (!unseated.length) break;
-        if (rid === null) next.set(tid, unseated.pop());
-      }
+      unseated=unseatedReservationIds(next);
+      for(const [tid,rid] of next.entries()){ if(!unseated.length) break; if(rid===null) next.set(tid, unseated.pop()); }
       return next;
     }
 
-    /*************************
-     * Utilidades de malla (conectividad)
-     *************************/
-    function isConnectedBlock(usedTables) {
-      if (usedTables.length <= 1) return true;
-      const usedIds = new Set(usedTables.map(t => t.id));
-      const start = usedTables[0].id;
-      const stack = [start];
-      const visited = new Set([start]);
-      while (stack.length) {
-        const cur = stack.pop();
-        const neigh = adjacencyById.get(cur) || new Set();
-        for (const nb of neigh) {
-          if (!usedIds.has(nb) || visited.has(nb)) continue;
-          visited.add(nb);
-          stack.push(nb);
-        }
-      }
-      return visited.size === usedIds.size;
+    function isConnectedBlock(usedTables){
+      if(usedTables.length<=1) return true;
+      const usedIds=new Set(usedTables.map(t=>t.id)); const start=usedTables[0].id; const stack=[start]; const visited=new Set([start]);
+      while(stack.length){ const cur=stack.pop(); const neigh=adjacencyById.get(cur)||new Set();
+        for(const nb of neigh){ if(!usedIds.has(nb)||visited.has(nb)) continue; visited.add(nb); stack.push(nb); } }
+      return visited.size===usedIds.size;
     }
 
-    /*************************
-     * Regla “abrir el mínimo de salones” — IGNORANDO CELEBRACIONES
-     *************************/
-    const SALON_KEYS = ['salon1', 'salon2', 'salon3'];
+    const SALON_KEYS=['salon1','salon2','salon3'];
 
-    function computeSalonUsage(assign) {
-      const isCelebration = new Map(state.reservations.map(r => [r.id, r.celebration === 'si']));
-
-      // "salonOpen" aquí significa: hay alguna reserva NO-celebración sentada en ese salón
-      const salonOpen = { salon1: false, salon2: false, salon3: false };
-
-      // Mesas por reserva
-      const tablesByRes = new Map();
-      for (const [tid, rid] of assign.entries()) {
-        if (!rid) continue;
-        const t = tableById.get(tid);
-        if (!t) continue;
-        if (!tablesByRes.has(rid)) tablesByRes.set(rid, []);
-        tablesByRes.get(rid).push(t);
+    function computeSalonUsage(assign){
+      const isCelebration=new Map(state.reservations.map(r=>[r.id, r.celebration==='si']));
+      const salonOpen={salon1:false,salon2:false,salon3:false};
+      const tablesByRes=new Map();
+      for(const [tid,rid] of assign.entries()){ if(!rid) continue; const t=tableById.get(tid); if(!t) continue;
+        if(!tablesByRes.has(rid)) tablesByRes.set(rid,[]); tablesByRes.get(rid).push(t); }
+      const paxBySalon={salon1:0,salon2:0,salon3:0};
+      for(const r of state.reservations){
+        if(isCelebration.get(r.id)) continue;
+        const used=tablesByRes.get(r.id)||[]; if(!used.length) continue;
+        const zonesUsed=new Set(used.map(t=>t.zone));
+        for(const z of zonesUsed){ if(z==='salon1'||z==='salon2'||z==='salon3') salonOpen[z]=true; }
+        if(zonesUsed.size===1){ const z=used[0].zone; if(z==='salon1'||z==='salon2'||z==='salon3') paxBySalon[z]+=r.pax; }
       }
-
-      // Ocupación por salón SOLO con NO-celebración (sumando pax de reservas ubicadas íntegramente en ese salón)
-      const paxBySalon = { salon1: 0, salon2: 0, salon3: 0 };
-
-      for (const r of state.reservations) {
-        if (isCelebration.get(r.id)) continue; // ignoramos celebraciones
-        const used = tablesByRes.get(r.id) || [];
-        if (!used.length) continue;
-
-        // marcar salón abierto si hay NO-celebración en él
-        const zonesUsed = new Set(used.map(t => t.zone));
-        for (const z of zonesUsed) {
-          if (z === 'salon1' || z === 'salon2' || z === 'salon3') salonOpen[z] = true;
-        }
-
-        // sumar pax si está íntegramente en un único salón
-        if (zonesUsed.size === 1) {
-          const z = used[0].zone;
-          if (z === 'salon1' || z === 'salon2' || z === 'salon3') paxBySalon[z] += r.pax;
-        }
-      }
-
       return { salonOpen, paxBySalon };
     }
 
-    // ¿El salón está abierto exclusivamente para celebraciones?
-    function salonComposition(assign) {
-      const comp = {
-        salon1: { celebr: 0, nonCelebr: 0 },
-        salon2: { celebr: 0, nonCelebr: 0 },
-        salon3: { celebr: 0, nonCelebr: 0 },
-      };
-
-      const isCelebration = new Map(state.reservations.map(r => [r.id, r.celebration === 'si']));
-
-      const tablesByRes = new Map();
-      for (const [tid, rid] of assign.entries()) {
-        if (!rid) continue;
-        const t = tableById.get(tid);
-        if (!t) continue;
-        if (!tablesByRes.has(rid)) tablesByRes.set(rid, []);
-        tablesByRes.get(rid).push(t);
+    function salonComposition(assign){
+      const comp={ salon1:{celebr:0,nonCelebr:0}, salon2:{celebr:0,nonCelebr:0}, salon3:{celebr:0,nonCelebr:0} };
+      const isCelebration=new Map(state.reservations.map(r=>[r.id, r.celebration==='si']));
+      const tablesByRes=new Map();
+      for(const [tid,rid] of assign.entries()){ if(!rid) continue; const t=tableById.get(tid); if(!t) continue;
+        if(!tablesByRes.has(rid)) tablesByRes.set(rid,[]); tablesByRes.get(rid).push(t); }
+      for(const [rid,tables] of tablesByRes.entries()){
+        const salons=new Set(tables.map(t=>t.zone).filter(z=>z==='salon1'||z==='salon2'||z==='salon3'));
+        for(const z of salons){ if(isCelebration.get(rid)) comp[z].celebr+=1; else comp[z].nonCelebr+=1; }
       }
-
-      for (const [rid, tables] of tablesByRes.entries()) {
-        const salons = new Set(
-          tables.map(t => t.zone).filter(z => z === 'salon1' || z === 'salon2' || z === 'salon3')
-        );
-        for (const z of salons) {
-          if (isCelebration.get(rid)) comp[z].celebr += 1;
-          else comp[z].nonCelebr += 1;
-        }
-      }
-
       return comp;
     }
 
-    /* ======= Penalización por apertura prematura (ya incluida) ======= */
-    function salonEarlyOpenPenalty(assign) {
-      const { salonOpen, paxBySalon } = computeSalonUsage(assign);
-      const comp = salonComposition(assign);
+    function salonEarlyOpenPenalty(assign){
+      const { salonOpen, paxBySalon }=computeSalonUsage(assign);
+      const comp=salonComposition(assign);
+      const cap1=ZONE_CAPACITY.salon1, cap2=ZONE_CAPACITY.salon2, cap3=ZONE_CAPACITY.salon3;
+      const s1OnlyCelebr = comp.salon1.celebr>0 && comp.salon1.nonCelebr===0;
+      const s2OnlyCelebr = comp.salon2.celebr>0 && comp.salon2.nonCelebr===0;
+      const s3OnlyCelebr = comp.salon3.celebr>0 && comp.salon3.nonCelebr===0;
 
-      const cap1 = ZONE_CAPACITY.salon1;
-      const cap2 = ZONE_CAPACITY.salon2;
-      const cap3 = ZONE_CAPACITY.salon3;
-
-      const s1OnlyCelebr = comp.salon1.celebr > 0 && comp.salon1.nonCelebr === 0;
-      const s2OnlyCelebr = comp.salon2.celebr > 0 && comp.salon2.nonCelebr === 0;
-      const s3OnlyCelebr = comp.salon3.celebr > 0 && comp.salon3.nonCelebr === 0;
-
-      let penalty = 0;
-      const offenders = [];
-
-      if (!s2OnlyCelebr && salonOpen.salon2) {
-        if (comp.salon1.nonCelebr > 0) {
-          const prevOcc = paxBySalon.salon1;
-          const prevCap = cap1;
-          const prev80  = 0.8 * prevCap;
-
-          const x = paxBySalon.salon2;
-          const freePrev = Math.max(0, prevCap - prevOcc);
-
-          const condition80 = prevOcc <= prev80;
-          const conditionFit = freePrev >= (x + 5);
-
-          if (condition80 && conditionFit) {
-            penalty += PENALTIES.salonEarlyOpen;
-            offenders.push({
-              salon: 'salon2',
-              detail: `S1 ${prevOcc}/${prevCap} (≤80%), libre ${freePrev}; S2 x=${x} → x+5=${x+5} cabía en S1`
-            });
-          }
+      let penalty=0; const offenders=[];
+      if(!s2OnlyCelebr && salonOpen.salon2){
+        if(comp.salon1.nonCelebr>0){
+          const prevOcc=paxBySalon.salon1, prevCap=cap1, prev80=0.8*prevCap;
+          const x=paxBySalon.salon2; const freePrev=Math.max(0, prevCap-prevOcc);
+          if(prevOcc<=prev80 && freePrev>=(x+5)){ penalty+=PENALTIES.salonEarlyOpen; offenders.push({salon:'salon2', detail:`S1 ${prevOcc}/${prevCap} (≤80%), libre ${freePrev}; S2 x=${x} → x+5=${x+5} cabía en S1`}); }
         }
       }
-
-      if (!s3OnlyCelebr && salonOpen.salon3) {
-        const hasS2NonCeleb = comp.salon2.nonCelebr > 0;
-        const hasS1NonCeleb = comp.salon1.nonCelebr > 0;
-
-        const prevSalonKey = hasS2NonCeleb ? 'salon2' : (hasS1NonCeleb ? 'salon1' : null);
-        if (prevSalonKey) {
-          const prevCap = prevSalonKey === 'salon2' ? cap2 : cap1;
-          const prevOcc = paxBySalon[prevSalonKey];
-          const prev80  = 0.8 * prevCap;
-
-          const x = paxBySalon.salon3;
-          const freePrev = Math.max(0, prevCap - prevOcc);
-
-          const condition80 = prevOcc <= prev80;
-          const conditionFit = freePrev >= (x + 5);
-
-          if (condition80 && conditionFit) {
-            penalty += PENALTIES.salonEarlyOpen;
-            offenders.push({
-              salon: 'salon3',
-              detail: `Previo ${prevSalonKey.toUpperCase()} ${prevOcc}/${prevCap} (≤80%), libre ${freePrev}; S3 x=${x} → x+5=${x+5}`
-            });
-          }
+      if(!s3OnlyCelebr && salonOpen.salon3){
+        const hasS2=comp.salon2.nonCelebr>0, hasS1=comp.salon1.nonCelebr>0;
+        const prevSalonKey = hasS2 ? 'salon2' : (hasS1 ? 'salon1' : null);
+        if(prevSalonKey){
+          const prevCap=prevSalonKey==='salon2'?cap2:cap1; const prevOcc=paxBySalon[prevSalonKey]; const prev80=0.8*prevCap;
+          const x=paxBySalon.salon3; const freePrev=Math.max(0, prevCap-prevOcc);
+          if(prevOcc<=prev80 && freePrev>=(x+5)){ penalty+=PENALTIES.salonEarlyOpen; offenders.push({salon:'salon3', detail:`Previo ${prevSalonKey.toUpperCase()} ${prevOcc}/${prevCap} (≤80%), libre ${freePrev}; S3 x=${x} → x+5=${x+5}`}); }
         }
       }
-
       return { penalty, offenders };
     }
 
-    /*************************
-     * Celebraciones mezcladas en salones (ya incluido)
-     *************************/
-    function celebrationMixedSalonPenalty(assign) {
-      const tablesByReservation = new Map();
-      for (const [tid, rid] of assign.entries()) {
-        if (!rid) continue;
-        const t = tableById.get(tid);
-        if (!t) continue;
-        if (!tablesByReservation.has(rid)) tablesByReservation.set(rid, []);
-        tablesByReservation.get(rid).push(t);
+    function celebrationMixedSalonPenalty(assign){
+      const tablesByReservation=new Map();
+      for(const [tid,rid] of assign.entries()){ if(!rid) continue; const t=tableById.get(tid); if(!t) continue;
+        if(!tablesByReservation.has(rid)) tablesByReservation.set(rid,[]); tablesByReservation.get(rid).push(t); }
+      const reservationsInSalon={ salon1:new Set(), salon2:new Set(), salon3:new Set() };
+      for(const [rid,tables] of tablesByReservation.entries()){
+        const zones=new Set(tables.map(t=>t.zone));
+        for(const z of zones){ if(z==='salon1'||z==='salon2'||z==='salon3') reservationsInSalon[z].add(rid); }
       }
-
-      const reservationsInSalon = { salon1: new Set(), salon2: new Set(), salon3: new Set() };
-      for (const [rid, tables] of tablesByReservation.entries()) {
-        const zones = new Set(tables.map(t => t.zone));
-        for (const z of zones) {
-          if (z === 'salon1' || z === 'salon2' || z === 'salon3') {
-            reservationsInSalon[z].add(rid);
-          }
+      const celebrationById=new Map(state.reservations.map(r=>[r.id, r.celebration||'no']));
+      let penalty=0; const offenders=[];
+      for(const salon of SALON_KEYS){
+        const rids=[...reservationsInSalon[salon]]; if(!rids.length) continue;
+        const hasCeleb=rids.some(id=>celebrationById.get(id)==='si');
+        const hasNonCeleb=rids.some(id=>celebrationById.get(id)!=='si');
+        if(hasCeleb && hasNonCeleb){
+          for(const rid of rids){ if(celebrationById.get(rid)==='si'){ penalty+=PENALTIES.celebrationMixedSalon; offenders.push({ salon, reservaId: rid }); } }
         }
       }
-
-      const celebrationById = new Map(state.reservations.map(r => [r.id, r.celebration || 'no']));
-
-      let penalty = 0;
-      const offenders = [];
-
-      for (const salon of SALON_KEYS) {
-        const rids = [...reservationsInSalon[salon]];
-        if (!rids.length) continue;
-        const hasCeleb = rids.some(id => celebrationById.get(id) === 'si');
-        const hasNonCeleb = rids.some(id => celebrationById.get(id) !== 'si');
-        if (hasCeleb && hasNonCeleb) {
-          for (const rid of rids) {
-            if (celebrationById.get(rid) === 'si') {
-              penalty += PENALTIES.celebrationMixedSalon;
-              offenders.push({ salon, reservaId: rid });
-            }
-          }
-        }
-      }
-
       return { penalty, offenders, tablesByReservation };
     }
 
-    /*************************
-     * NUEVA RESTRICCIÓN: mesa preferida exacta dentro de un salón
-     *************************/
-    function exactPreferredTablePenalty(assign) {
-      // Mapear mesas por reserva
-      const tablesByReservation = new Map();
-      for (const [tid, rid] of assign.entries()) {
-        if (!rid) continue;
-        const t = tableById.get(tid);
-        if (!t) continue;
-        if (!tablesByReservation.has(rid)) tablesByReservation.set(rid, []);
-        tablesByReservation.get(rid).push(t);
-      }
-
-      let penalty = 0;
-      const offenders = [];
-
-      for (const r of state.reservations) {
-        const wantSalon = r.prefSalon || 'ninguno';
-        const wantTableId = r.prefTableId || null;
-
-        // Solo penalizamos cuando hay mesa concreta pedida de un salón concreto
-        if (wantSalon !== 'ninguno' && wantTableId) {
-          const used = tablesByReservation.get(r.id) || [];
-          const ids = new Set(used.map(t => t.id));
-          if (!ids.has(Number(wantTableId))) {
-            penalty += PENALTIES.exactPreferredTable;
-            offenders.push({
-              reservaId: r.id,
-              mesaId: wantTableId
-            });
-          }
+    function exactPreferredTablePenalty(assign){
+      const tablesByReservation=new Map();
+      for(const [tid,rid] of assign.entries()){ if(!rid) continue; const t=tableById.get(tid); if(!t) continue;
+        if(!tablesByReservation.has(rid)) tablesByReservation.set(rid,[]); tablesByReservation.get(rid).push(t); }
+      let penalty=0; const offenders=[];
+      for(const r of state.reservations){
+        const wantSalon=r.prefSalon||'ninguno'; const wantTableId=r.prefTableId||null;
+        if(wantSalon!=='ninguno' && wantTableId){
+          const used=tablesByReservation.get(r.id)||[]; const ids=new Set(used.map(t=>t.id));
+          if(!ids.has(Number(wantTableId))){ penalty+=PENALTIES.exactPreferredTable; offenders.push({reservaId:r.id, mesaId:wantTableId}); }
         }
       }
-
       return { penalty, offenders };
     }
 
-    /*************************
-     * Scoring simple
-     *************************/
-    function score(assign) {
-      let s = 0;
+    function score(assign){
+      let s=0;
+      const seatedSet=seatedReservationIds(assign); const missing=state.reservations.filter(r=>!seatedSet.has(r.id)).length;
+      if(missing>0) s+=missing*PENALTIES.unseatedReservation;
 
-      const seatedSet = seatedReservationIds(assign);
-      const missing = state.reservations.filter(r => !seatedSet.has(r.id)).length;
-      if (missing > 0) s += missing * PENALTIES.unseatedReservation;
+      const tablesByReservation=new Map();
+      for(const [tid,rid] of assign.entries()){ if(!rid) continue; const t=tableById.get(tid); if(!t) continue;
+        if(!tablesByReservation.has(rid)) tablesByReservation.set(rid,[]); tablesByReservation.get(rid).push(t); }
 
-      const tablesByReservation = new Map();
-      for (const [tid, rid] of assign.entries()) {
-        if (!rid) continue;
-        const t = tableById.get(tid);
-        if (!t) continue;
-        if (!tablesByReservation.has(rid)) tablesByReservation.set(rid, []);
-        tablesByReservation.get(rid).push(t);
-      }
-
-      for (const r of state.reservations) {
-        const used = tablesByReservation.get(r.id) || [];
-        const k = used.length;
-        if (k === 0) continue;
-
-        const zones = new Set(used.map(t => t.zone));
-        const isMulti = k > 1;
-
-        if (!isMulti) {
-          const t = used[0];
-          if ((t.terrace && r.terrace === 'no') || (!t.terrace && r.terrace === 'si')) s += PENALTIES.preferenceMismatch;
-          if (r.pax > t.maxCap) s += PENALTIES.capacityOverflowSingle;
-        } else {
-          const totalMax = used.reduce((acc, t) => acc + t.maxCap, 0);
-          const totalMin = used.reduce((acc, t) => acc + t.minCap, 0);
-          const fitsByRange = (r.pax >= totalMin) && (r.pax <= totalMax);
-
-          if (!fitsByRange && r.pax > totalMax) s += PENALTIES.capacityOverflowGroup;
-
-          if (zones.size > 1) {
-            s += PENALTIES.multiNotSameZone;
-          } else {
-            const connected = isConnectedBlock(used);
-            if (!connected) s += PENALTIES.multiNotContiguous;
-            const terraceZone = used[0].terrace ? 'si' : 'no';
-            if (terraceZone !== r.terrace) s += PENALTIES.preferenceMismatch;
+      for(const r of state.reservations){
+        const used=tablesByReservation.get(r.id)||[]; const k=used.length; if(k===0) continue;
+        const zones=new Set(used.map(t=>t.zone)); const isMulti=k>1;
+        if(!isMulti){
+          const t=used[0];
+          if((t.terrace && r.terrace==='no') || (!t.terrace && r.terrace==='si')) s+=PENALTIES.preferenceMismatch;
+          if(r.pax>t.maxCap) s+=PENALTIES.capacityOverflowSingle;
+        }else{
+          const totalMax=used.reduce((a,t)=>a+t.maxCap,0);
+          const totalMin=used.reduce((a,t)=>a+t.minCap,0);
+          const fitsByRange=(r.pax>=totalMin)&&(r.pax<=totalMax);
+          if(!fitsByRange && r.pax>totalMax) s+=PENALTIES.capacityOverflowGroup;
+          if(zones.size>1){ s+=PENALTIES.multiNotSameZone; }
+          else{
+            const connected=isConnectedBlock(used); if(!connected) s+=PENALTIES.multiNotContiguous;
+            const terraceZone=used[0].terrace?'si':'no'; if(terraceZone!==r.terrace) s+=PENALTIES.preferenceMismatch;
           }
-
-          if (totalMax >= 4 * r.pax) {
-            const minTables = minTablesNeededForPax(r.pax);
-            if (k > minTables) s += (k - minTables) * PENALTIES.extraTablesUsed;
+          if(totalMax>=4*r.pax){
+            const minTables=minTablesNeededForPax(r.pax);
+            if(k>minTables) s+=(k-minTables)*PENALTIES.extraTablesUsed;
           }
-
-          const gaps = Math.max(0, totalMax - r.pax);
-          if (gaps > 0) s += gaps * PENALTIES.multiSeatGaps;
+          const gaps=Math.max(0,totalMax-r.pax); if(gaps>0) s+=gaps*PENALTIES.multiSeatGaps;
         }
       }
-
-      for (const [aId, bId] of adjacencyPairs) {
-        const ra = assign.get(aId);
-        const rb = assign.get(bId);
-        if (!ra || !rb) continue;
-        const A = state.reservations.find(x=>x.id===ra);
-        const B = state.reservations.find(x=>x.id===rb);
-        if (!A || !B) continue;
-        if ((A.kids === 'si' && B.kids === 'no') || (A.kids === 'no' && B.kids === 'si')) {
-          s += PENALTIES.kidsConflictAdj;
-        }
+      for(const [aId,bId] of adjacencyPairs){
+        const ra=assign.get(aId), rb=assign.get(bId); if(!ra||!rb) continue;
+        const A=state.reservations.find(x=>x.id===ra), B=state.reservations.find(x=>x.id===rb); if(!A||!B) continue;
+        if((A.kids==='si'&&B.kids==='no')||(A.kids==='no'&&B.kids==='si')) s+=PENALTIES.kidsConflictAdj;
       }
-
-      const salonCheck = salonEarlyOpenPenalty(assign);
-      s += salonCheck.penalty;
-
-      const celebCheck = celebrationMixedSalonPenalty(assign);
-      s += celebCheck.penalty;
-
-      // NUEVO: penalización por no respetar mesa concreta pedida
-      const exactPref = exactPreferredTablePenalty(assign);
-      s += exactPref.penalty;
-
+      const salonCheck=salonEarlyOpenPenalty(assign); s+=salonCheck.penalty;
+      const celebCheck=celebrationMixedSalonPenalty(assign); s+=celebCheck.penalty;
+      const exactPref=exactPreferredTablePenalty(assign); s+=exactPref.penalty;
       return s;
     }
 
-    /*************************
-     * Scoring con detalle (tarjeta de penalizaciones)
-     *************************/
-    function scoreWithPenalties(assign) {
-      let s = 0;
-      const penalties = [];
+    function scoreWithPenalties(assign){
+      let s=0; const penalties=[];
+      const add=(mesa,tipo,puntos,detalle,reservaId)=>{ const id=`${tipo}-${mesa?mesa.id:'none'}-${reservaId??'none'}-${Math.random().toString(36).slice(2)}`;
+        penalties.push({ id, mesaId:mesa?mesa.id:null, mesaName:mesa?mesa.name:null, zone:mesa?mesa.zone:null, reservaId:reservaId??null, tipo, puntos, detalle:detalle||null }); s+=puntos; };
+      const seatedSet=new Set([...assign.values()].filter(Boolean));
+      const missingIds=state.reservations.filter(r=>!seatedSet.has(r.id)).map(r=>r.id);
+      for(const rid of missingIds) add(null,'unseatedReservation',PENALTIES.unseatedReservation,'Reserva no sentada',rid);
 
-      const add = (mesa, tipo, puntos, detalle, reservaId) => {
-        const id = `${tipo}-${mesa ? mesa.id : 'none'}-${reservaId ?? 'none'}-${Math.random().toString(36).slice(2)}`;
-        penalties.push({
-          id,
-          mesaId: mesa ? mesa.id : null,
-          mesaName: mesa ? mesa.name : null,
-          zone: mesa ? mesa.zone : null,
-          reservaId: reservaId ?? null,
-          tipo,
-          puntos,
-          detalle: detalle || null
-        });
-        s += puntos;
-      };
+      const tablesByReservation=new Map();
+      for(const [tid,rid] of assign.entries()){ if(!rid) continue; const t=tableById.get(tid); if(!t) continue;
+        if(!tablesByReservation.has(rid)) tablesByReservation.set(rid,[]); tablesByReservation.get(rid).push(t); }
 
-      // — No sentados
-      const seatedSet = new Set([...assign.values()].filter(Boolean));
-      const missingIds = state.reservations.filter(r => !seatedSet.has(r.id)).map(r => r.id);
-      for (const rid of missingIds) add(null, 'unseatedReservation', PENALTIES.unseatedReservation, 'Reserva no sentada', rid);
-
-      // Agrupar mesas por reserva
-      const tablesByReservation = new Map();
-      for (const [tid, rid] of assign.entries()) {
-        if (!rid) continue;
-        const t = tableById.get(tid);
-        if (!t) continue;
-        if (!tablesByReservation.has(rid)) tablesByReservation.set(rid, []);
-        tablesByReservation.get(rid).push(t);
-      }
-
-      for (const r of state.reservations) {
-        const used = tablesByReservation.get(r.id) || [];
-        const k = used.length;
-        if (k === 0) continue;
-
-        const zones = new Set(used.map(t => t.zone));
-        const isMulti = k > 1;
-
-        if (!isMulti) {
-          const t = used[0];
-          if ((t.terrace && r.terrace === 'no') || (!t.terrace && r.terrace === 'si')) {
-            add(t, 'preferenceMismatch', PENALTIES.preferenceMismatch,
-                `Pidió ${r.terrace === 'si' ? 'terraza' : 'interior'} y está en ${t.terrace ? 'terraza' : 'interior'}`, r.id);
+      for(const r of state.reservations){
+        const used=tablesByReservation.get(r.id)||[]; const k=used.length; if(k===0) continue;
+        const zones=new Set(used.map(t=>t.zone)); const isMulti=k>1;
+        if(!isMulti){
+          const t=used[0];
+          if((t.terrace && r.terrace==='no') || (!t.terrace && r.terrace==='si')){
+            add(t,'preferenceMismatch',PENALTIES.preferenceMismatch,`Pidió ${r.terrace==='si'?'terraza':'interior'} y está en ${t.terrace?'terraza':'interior'}`, r.id);
           }
-          if (r.pax > t.maxCap) {
-            add(t, 'capacityOverflowSingle', PENALTIES.capacityOverflowSingle,
-                `Reserva de ${r.pax} > cap máx ${t.maxCap}`, r.id);
+          if(r.pax>t.maxCap){ add(t,'capacityOverflowSingle',PENALTIES.capacityOverflowSingle,`Reserva de ${r.pax} > cap máx ${t.maxCap}`, r.id); }
+        }else{
+          const totalMax=used.reduce((a,t)=>a+t.maxCap,0); const totalMin=used.reduce((a,t)=>a+t.minCap,0);
+          const fitsByRange=(r.pax>=totalMin)&&(r.pax<=totalMax);
+          if(!fitsByRange && r.pax>totalMax) add(null,'capacityOverflowGroup',PENALTIES.capacityOverflowGroup,`Reserva ${r.pax} > suma cap máx ${totalMax}`, r.id);
+          if(zones.size>1){ add(null,'multiNotSameZone',PENALTIES.multiNotSameZone,'Mesas de zonas distintas', r.id); }
+          else{
+            const connected=isConnectedBlock(used); if(!connected) add(null,'multiNotContiguous',PENALTIES.multiNotContiguous,'Mesas no contiguas (malla)', r.id);
+            const terraceZone=used[0].terrace?'si':'no';
+            if(terraceZone!==r.terrace){ add(null,'preferenceMismatch',PENALTIES.preferenceMismatch,`Pidió ${r.terrace==='si'?'terraza':'interior'} y está en ${terraceZone==='si'?'terraza':'interior'}`, r.id); }
           }
-        } else {
-          const totalMax = used.reduce((acc, t) => acc + t.maxCap, 0);
-          const totalMin = used.reduce((acc, t) => acc + t.minCap, 0);
-          const fitsByRange = (r.pax >= totalMin) && (r.pax <= totalMax);
-
-          if (!fitsByRange && r.pax > totalMax) {
-            add(null, 'capacityOverflowGroup', PENALTIES.capacityOverflowGroup,
-                `Reserva ${r.pax} > suma cap máx ${totalMax}`, r.id);
-          }
-
-          if (zones.size > 1) {
-            add(null, 'multiNotSameZone', PENALTIES.multiNotSameZone, 'Mesas de zonas distintas', r.id);
-          } else {
-            const connected = isConnectedBlock(used);
-            if (!connected) add(null, 'multiNotContiguous', PENALTIES.multiNotContiguous, 'Mesas no contiguas (malla)', r.id);
-
-            const terraceZone = used[0].terrace ? 'si' : 'no';
-            if (terraceZone !== r.terrace) {
-              add(null, 'preferenceMismatch', PENALTIES.preferenceMismatch,
-                  `Pidió ${r.terrace === 'si' ? 'terraza' : 'interior'} y está en ${terraceZone === 'si' ? 'terraza' : 'interior'}`, r.id);
+          if(totalMax>=4*r.pax){
+            const minTables=minTablesNeededForPax(r.pax);
+            if(k>minTables){
+              const extra=(k-minTables)*PENALTIES.extraTablesUsed; const per=Math.ceil(extra/used.length);
+              for(const t of used) add(t,'extraTablesUsed',per,`Usa ${k} mesas, mínimo teórico ${minTables} (cap total ${totalMax} ≥ 4×${r.pax})`, r.id);
             }
           }
-
-          if (totalMax >= 4 * r.pax) {
-            const minTables = minTablesNeededForPax(r.pax);
-            if (k > minTables) {
-              const extra = (k - minTables) * PENALTIES.extraTablesUsed;
-              const per = Math.ceil(extra / used.length);
-              for (const t of used) add(t, 'extraTablesUsed', per,
-                  `Usa ${k} mesas, mínimo teórico ${minTables} (cap total ${totalMax} ≥ 4×${r.pax})`, r.id);
-            }
-          }
-
-          const gaps = Math.max(0, totalMax - r.pax);
-          if (gaps > 0) {
-            const totalPts = gaps * PENALTIES.multiSeatGaps;
-            const per = Math.ceil(totalPts / used.length);
-            for (const t of used) add(t, 'multiSeatGaps', per, `${gaps} asientos libres en el bloque`, r.id);
+          const gaps=Math.max(0,totalMax-r.pax);
+          if(gaps>0){ const totalPts=gaps*PENALTIES.multiSeatGaps; const per=Math.ceil(totalPts/used.length);
+            for(const t of used) add(t,'multiSeatGaps',per,`${gaps} asientos libres en el bloque`, r.id);
           }
         }
       }
 
-      // Contigüidad niños
-      for (const [aId, bId] of adjacencyPairs) {
-        const ra = assign.get(aId);
-        const rb = assign.get(bId);
-        if (!ra || !rb) continue;
-        const A = state.reservations.find(x=>x.id===ra);
-        const B = state.reservations.find(x=>x.id===rb);
-        if (!A || !B) continue;
-        if ((A.kids === 'si' && B.kids === 'no') || (A.kids === 'no' && B.kids === 'si')) {
-          const ta = tableById.get(aId);
-          if (ta) add(ta, 'kidsConflictAdj', PENALTIES.kidsConflictAdj, `Contigua a mesa con ${B.kids === 'si' ? '' : 'no '}niños`, A.id);
-        }
+      for(const [aId,bId] of adjacencyPairs){
+        const ra=assign.get(aId), rb=assign.get(bId); if(!ra||!rb) continue;
+        const A=state.reservations.find(x=>x.id===ra), B=state.reservations.find(x=>x.id===rb); if(!A||!B) continue;
+        if((A.kids==='si'&&B.kids==='no')||(A.kids==='no'&&B.kids==='si')){ const ta=tableById.get(aId); if(ta) add(ta,'kidsConflictAdj',PENALTIES.kidsConflictAdj,`Contigua a mesa con ${B.kids==='si'?'':'no '}niños`, A.id); }
       }
 
       const { penalty, offenders } = salonEarlyOpenPenalty(assign);
-      if (penalty > 0) {
-        for (const off of offenders) {
-          add(null, 'salonEarlyOpen', PENALTIES.salonEarlyOpen,
-              `Se abrió ${off.salon} con S_prev ≤80% y x+5 cabía en el salón previo (${off.detail})`,
-              null);
+      if(penalty>0){ for(const off of offenders){ add(null,'salonEarlyOpen',PENALTIES.salonEarlyOpen,`Se abrió ${off.salon} con S_prev ≤80% y x+5 cabía en el salón previo (${off.detail})`, null); } }
+
+      const celeb=celebrationMixedSalonPenalty(assign);
+      if(celeb.penalty>0){
+        for(const off of celeb.offenders){
+          let mesaAssoc=null; const used=celeb.tablesByReservation.get(off.reservaId)||[]; mesaAssoc=used.find(t=>t.zone===off.salon)||used[0]||null;
+          add(mesaAssoc,'celebrationMixedSalon',PENALTIES.celebrationMixedSalon,`Reserva de celebración en ${off.salon} mezclada con reservas que no son celebración`, off.reservaId);
         }
       }
 
-      const celeb = celebrationMixedSalonPenalty(assign);
-      if (celeb.penalty > 0) {
-        for (const off of celeb.offenders) {
-          let mesaAssoc = null;
-          const used = celeb.tablesByReservation.get(off.reservaId) || [];
-          mesaAssoc = used.find(t => t.zone === off.salon) || used[0] || null;
-          add(mesaAssoc, 'celebrationMixedSalon', PENALTIES.celebrationMixedSalon,
-              `Reserva de celebración en ${off.salon} mezclada con reservas que no son celebración`, off.reservaId);
+      const exact=exactPreferredTablePenalty(assign);
+      if(exact.penalty>0){
+        for(const off of exact.offenders){
+          const mesa=tableById.get(Number(off.mesaId))||null;
+          add(mesa,'exactPreferredTable',PENALTIES.exactPreferredTable,`No se respetó la mesa preferida (${mesa?mesa.name:'ID '+off.mesaId})`, off.reservaId);
         }
       }
-
-      // NUEVO: detalle de mesa exacta preferida
-      const exact = exactPreferredTablePenalty(assign);
-      if (exact.penalty > 0) {
-        for (const off of exact.offenders) {
-          const mesa = tableById.get(Number(off.mesaId)) || null;
-          add(mesa, 'exactPreferredTable', PENALTIES.exactPreferredTable,
-              `No se respetó la mesa preferida (${mesa ? mesa.name : 'ID ' + off.mesaId})`, off.reservaId);
-        }
-      }
-
-      return { score: s, penalties };
+      return { score:s, penalties };
     }
 
-    /*************************
-     * Optimizadores Montecarlo
-     *************************/
-    function shuffle(arr) {
-      for (let i = arr.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        const tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp;
+    function shuffle(arr){ for(let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); const tmp=arr[i]; arr[i]=arr[j]; arr[j]=tmp; } return arr; }
+
+    // >>> NUEVO: utilidades para mover reservas entre salones de forma dirigida
+    function occupiedTablesOf(assign, rid){
+      const list=[]; for(const [tid,rr] of assign.entries()){ if(rr===rid){ const t=tableById.get(tid); if(t) list.push(t); } }
+      return list;
+    }
+    function chooseTablesForReservation(salonKey, pax, assign){
+      // mesas del salón ordenadas por capacidad descendente, priorizando libres
+      const list=[...(zones[salonKey]||[])].map(t=>({ t, occ: assign.get(t.id) }));
+      list.sort((a,b)=>{
+        const freeA = a.occ?1:0, freeB = b.occ?1:0;
+        if(freeA!==freeB) return freeA-freeB; // libres primero
+        return b.t.maxCap - a.t.maxCap;       // más grandes primero
+      });
+      const chosen=[]; let cap=0;
+      for(const it of list){
+        chosen.push(it.t); cap += it.t.maxCap;
+        if(cap>=pax) break;
       }
-      return arr;
+      return { chosen, totalCap:cap };
+    }
+    function moveReservationToSalon(assign, rid, salonKey){
+      const r=state.reservations.find(x=>x.id===rid); if(!r) return null;
+      const next=new Map(assign);
+      // liberar sus mesas actuales
+      for(const t of occupiedTablesOf(next, rid)) next.set(t.id, null);
+      // elegir nuevas mesas en destino
+      const pick=chooseTablesForReservation(salonKey, r.pax, next);
+      if(pick.chosen.length===0) return null;
+      // reasignar (robamos si están ocupadas; repair luego arregla duplicados/unseated)
+      for(const t of pick.chosen) next.set(t.id, rid);
+      return repairAssignment(next);
+    }
+    function pickSalonForCelebrationMove(assign){
+      // preferimos un salón con solo celebraciones o vacío; orden S3->S2->S1
+      const comp=salonComposition(assign);
+      const order=['salon3','salon2','salon1'];
+      for(const s of order){
+        const c=comp[s]; const hasAny=(c.celebr+c.nonCelebr)>0;
+        if(!hasAny || (c.celebr>0 && c.nonCelebr===0)) return s;
+      }
+      return 'salon3';
     }
 
-    function randomInitialAssignment() {
-      const assign = new Map(TABLES.map(t => [t.id, null]));
-      const res = shuffle([...state.reservations]);
-      const tbl = shuffle([...TABLES]);
-
-      let ti = 0;
-      for (const r of res) {
-        if (ti >= tbl.length) break;
-        assign.set(tbl[ti].id, r.id);
-        ti++;
+    // >>> NUEVO: vecindario guiado por penalizaciones
+    function targetedRepairMove(assign){
+      const { offenders: mixOff } = celebrationMixedSalonPenalty(assign);
+      if(mixOff.length){
+        // Elegimos una reserva de celebración que está mezclada
+        const offender = mixOff[Math.floor(Math.random()*mixOff.length)];
+        const rid = offender.reservaId;
+        const targetSalon = pickSalonForCelebrationMove(assign);
+        const moved = moveReservationToSalon(assign, rid, targetSalon);
+        if(moved) return moved;
       }
-      for (const r of res) {
-        if (r.pax > 6 && ti < tbl.length) {
-          assign.set(tbl[ti].id, r.id);
-          ti++;
+      const eo = salonEarlyOpenPenalty(assign);
+      if(eo.offenders.length){
+        // Mover una reserva NO celebración desde el salón “abierto pronto” al anterior
+        const target = eo.offenders[Math.floor(Math.random()*eo.offenders.length)];
+        const fromSalon = target.salon; // 'salon2' o 'salon3'
+        const prevSalon = fromSalon==='salon3' ? 'salon2' : 'salon1';
+        // lista de reservas no celebración en fromSalon
+        const resIds = [];
+        for(const [tid,rid] of assign.entries()){
+          if(!rid) continue;
+          const t=tableById.get(tid); if(!t||t.zone!==fromSalon) continue;
+          const r=state.reservations.find(x=>x.id===rid); if(!r||r.celebration==='si') continue;
+          resIds.push(rid);
+        }
+        const unique=[...new Set(resIds)];
+        if(unique.length){
+          const rid=unique[Math.floor(Math.random()*unique.length)];
+          const moved=moveReservationToSalon(assign, rid, prevSalon);
+          if(moved) return moved;
+        }
+      }
+      return null;
+    }
+
+    // >>> NUEVO: inicialización sesgada (celebraciones primero en S3->S2->S1, no-celebración en S1->S2->S3)
+    function randomInitialAssignment(){
+      const assign=new Map(TABLES.map(t=>[t.id,null]));
+      const celebs = shuffle(state.reservations.filter(r=>r.celebration==='si').slice());
+      const normals = shuffle(state.reservations.filter(r=>r.celebration!=='si').slice());
+
+      const placeList = (reservas, order)=>{
+        for(const r of reservas){
+          let placed=false;
+          for(const salon of order){
+            const pick=chooseTablesForReservation(salon, r.pax, assign);
+            if(pick.chosen.length){
+              for(const t of pick.chosen) assign.set(t.id, r.id);
+              placed=true; break;
+            }
+          }
+          if(!placed){
+            // último recurso: cualquier mesa libre
+            for(const t of TABLES){ if(assign.get(t.id)===null){ assign.set(t.id, r.id); break; } }
+          }
+        }
+      };
+      placeList(celebs, ['salon3','salon2','salon1']);
+      placeList(normals, ['salon1','salon2','salon3']);
+
+      // bonus: rellenar alguna mesa adicional a grupos >6 si queda hueco
+      const big = normals.concat(celebs).filter(r=>r.pax>6);
+      for(const r of big){
+        const need=minTablesNeededForPax(r.pax);
+        const occ=occupiedTablesOf(assign, r.id).length;
+        if(occ<need){
+          const order = r.celebration==='si' ? ['salon3','salon2','salon1'] : ['salon1','salon2','salon3'];
+          for(const salon of order){
+            const pick=chooseTablesForReservation(salon, r.pax, assign);
+            for(const t of pick.chosen){
+              if(occupiedTablesOf(assign, r.id).length>=need) break;
+              if(assign.get(t.id)!==r.id) assign.set(t.id, r.id);
+            }
+            if(occupiedTablesOf(assign, r.id).length>=need) break;
+          }
         }
       }
       return repairAssignment(assign);
     }
 
-    function neighborProposal(assign) {
-      let next = new Map(assign);
-      const tableIds = TABLES.map(t => t.id);
-      const rpick = () => state.reservations[Math.floor(Math.random() * state.reservations.length)];
-      const r = Math.random();
+    // Vecindario base
+    function neighborProposal(assign){
+      let next=new Map(assign);
+      const tableIds=TABLES.map(t=>t.id);
+      const rpick=()=>state.reservations[Math.floor(Math.random()*state.reservations.length)];
+      const r=Math.random();
 
-      if (r < 0.4) {
-        const a = tableIds[Math.floor(Math.random() * tableIds.length)];
-        const b = tableIds[Math.floor(Math.random() * tableIds.length)];
-        const tmp = next.get(a);
-        next.set(a, next.get(b));
-        next.set(b, tmp);
-      } else if (r < 0.65) {
-        const t = tableIds[Math.floor(Math.random() * tableIds.length)];
-        const rr = rpick();
-        next.set(t, rr ? rr.id : null);
-      } else if (r < 0.8) {
-        const t = tableIds[Math.floor(Math.random() * tableIds.length)];
+      if(r<0.4){
+        const a=tableIds[Math.floor(Math.random()*tableIds.length)];
+        const b=tableIds[Math.floor(Math.random()*tableIds.length)];
+        const tmp=next.get(a); next.set(a,next.get(b)); next.set(b,tmp);
+      }else if(r<0.65){
+        const t=tableIds[Math.floor(Math.random()*tableIds.length)];
+        const rr=rpick(); next.set(t, rr?rr.id:null);
+      }else if(r<0.8){
+        const t=tableIds[Math.floor(Math.random()*tableIds.length)];
         next.set(t, null);
-      } else {
-        const big = state.reservations.filter(x => x.pax > 6);
-        if (big.length) {
-          const rr = big[Math.floor(Math.random() * big.length)];
-          const occupied = tableIds.filter(tid => next.get(tid) === rr.id);
-          if (occupied.length) {
-            const t0 = tableById.get(occupied[Math.floor(Math.random() * occupied.length)]);
-            if (t0) {
-              const neigh = Array.from((adjacencyById.get(t0.id) || new Set()));
-              const candidates = neigh.map(id => tableById.get(id)).filter(t => t && next.get(t.id) !== rr.id);
-              if (candidates.length) {
-                const cand = candidates[Math.floor(Math.random() * candidates.length)];
+      }else{
+        const big=state.reservations.filter(x=>x.pax>6);
+        if(big.length){
+          const rr=big[Math.floor(Math.random()*big.length)];
+          const occupied=tableIds.filter(tid=>next.get(tid)===rr.id);
+          if(occupied.length){
+            const t0=tableById.get(occupied[Math.floor(Math.random()*occupied.length)]);
+            if(t0){
+              const neigh=Array.from((adjacencyById.get(t0.id)||new Set()));
+              const candidates=neigh.map(id=>tableById.get(id)).filter(t=>t && next.get(t.id)!==rr.id);
+              if(candidates.length){
+                const cand=candidates[Math.floor(Math.random()*candidates.length)];
                 next.set(cand.id, rr.id);
               }
             }
           }
-        } else {
-          const t = tableIds[Math.floor(Math.random() * tableIds.length)];
-          const rr = rpick();
-          next.set(t, rr ? rr.id : null);
+        }else{
+          const t=tableIds[Math.floor(Math.random()*tableIds.length)];
+          const rr=rpick(); next.set(t, rr?rr.id:null);
         }
       }
       return repairAssignment(next);
     }
 
-    // === Montecarlo Mejorado
-    async function runMonteCarloImproved(iterations = 500000) {
-      if (state.reservations.length === 0) { alert('Agrega reservas primero'); return; }
+    // >>> NUEVO: vecino híbrido (35% guiado, 65% aleatorio)
+    function hybridNeighbor(assign){
+      if(Math.random()<0.35){
+        const fixed = targetedRepairMove(assign);
+        if(fixed) return fixed;
+      }
+      return neighborProposal(assign);
+    }
+
+    // === Montecarlo Mejorado (con vecindario guiado)
+    async function runMonteCarloImproved(iterations=150000){
+      if(state.reservations.length===0){ alert('Agrega reservas primero'); return; }
       resetChart();
 
-      let current = randomInitialAssignment();
-      let currentScore = score(current);
-      let best = new Map(current);
-      let bestScore = currentScore;
+      let current=randomInitialAssignment();
+      let currentScore=score(current);
+      let best=new Map(current);
+      let bestScore=currentScore;
 
-      const chunk = 500;
-      const sampleEvery = 50;
+      const chunk=500, sampleEvery=50;
 
-      for (let i = 1; i <= iterations; i++) {
-        const cand = neighborProposal(current);
-        const candScore = score(cand);
+      for(let i=1;i<=iterations;i++){
+        const cand=hybridNeighbor(current);
+        const candScore=score(cand);
 
-        if (candScore <= currentScore || Math.random() < 0.001) {
-          current = cand; currentScore = candScore;
-        }
-        if (candScore < bestScore) { best = new Map(cand); bestScore = candScore; }
+        if(candScore<=currentScore || Math.random()<0.001){ current=cand; currentScore=candScore; }
+        if(candScore<bestScore){ best=new Map(cand); bestScore=candScore; }
 
-        if (i % sampleEvery === 0 || i === iterations) bestHistory.push(bestScore);
-        if (i % chunk === 0 || i === iterations) {
-          elChartMeta.textContent = `Algoritmo: Mejorado · iter: ${i.toLocaleString()} · mejor: ${bestScore}`;
+        if(i%sampleEvery===0 || i===iterations) bestHistory.push(bestScore);
+        if(i%chunk===0 || i===iterations){
+          elChartMeta.textContent=`Algoritmo: Mejorado · iter: ${i.toLocaleString()} · mejor: ${bestScore}`;
           drawChart();
           await new Promise(r=>setTimeout(r,0));
         }
       }
 
-      state.assignment = best;
-      const detail = scoreWithPenalties(best);
-      if (elBestScore) elBestScore.textContent = String(detail.score);
-      renderTables();
-      renderPenalties(detail.penalties);
-      elChartMeta.textContent = `Algoritmo: Mejorado · iteraciones: ${iterations.toLocaleString()} · mejor: ${bestScore}`;
-      drawChart();
-      elChartCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      state.assignment=best;
+      const detail=scoreWithPenalties(best);
+      if(elBestScore) elBestScore.textContent=String(detail.score);
+      renderTables(); renderPenalties(detail.penalties);
+      elChartMeta.textContent=`Algoritmo: Mejorado · iteraciones: ${iterations.toLocaleString()} · mejor: ${bestScore}`;
+      drawChart(); elChartCard.scrollIntoView({behavior:'smooth', block:'start'});
     }
 
-    // === Montecarlo Básico
-    async function runMonteCarloBasic(iterations = 500000) {
-      if (state.reservations.length === 0) { alert('Agrega reservas primero'); return; }
+    // === Montecarlo Básico (sin cambios)
+    async function runMonteCarloBasic(iterations=150000){
+      if(state.reservations.length===0){ alert('Agrega reservas primero'); return; }
       resetChart();
 
-      let best = randomInitialAssignment();
-      let bestScore = score(best);
+      let best=randomInitialAssignment();
+      let bestScore=score(best);
 
-      const chunk = 500;
-      const sampleEvery = 50;
+      const chunk=500, sampleEvery=50;
+      for(let i=1;i<=iterations;i++){
+        const cand=randomInitialAssignment();
+        const candScore=score(cand);
+        if(candScore<bestScore){ best=new Map(cand); bestScore=candScore; }
 
-      for (let i = 1; i <= iterations; i++) {
-        const cand = randomInitialAssignment();
-        const candScore = score(cand);
-
-        if (candScore < bestScore) { best = new Map(cand); bestScore = candScore; }
-
-        if (i % sampleEvery === 0 || i === iterations) bestHistory.push(bestScore);
-        if (i % chunk === 0 || i === iterations) {
-          elChartMeta.textContent = `Algoritmo: Básico · iter: ${i.toLocaleString()} · mejor: ${bestScore}`;
+        if(i%sampleEvery===0 || i===iterations) bestHistory.push(bestScore);
+        if(i%chunk===0 || i===iterations){
+          elChartMeta.textContent=`Algoritmo: Básico · iter: ${i.toLocaleString()} · mejor: ${bestScore}`;
           drawChart();
           await new Promise(r=>setTimeout(r,0));
         }
       }
 
-      state.assignment = best;
-      const detail = scoreWithPenalties(best);
-      if (elBestScore) elBestScore.textContent = String(detail.score);
-      renderTables();
-      renderPenalties(detail.penalties);
-      elChartMeta.textContent = `Algoritmo: Básico · iteraciones: ${iterations.toLocaleString()} · mejor: ${bestScore}`;
-      drawChart();
-      elChartCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      state.assignment=best;
+      const detail=scoreWithPenalties(best);
+      if(elBestScore) elBestScore.textContent=String(detail.score);
+      renderTables(); renderPenalties(detail.penalties);
+      elChartMeta.textContent=`Algoritmo: Básico · iteraciones: ${iterations.toLocaleString()} · mejor: ${bestScore}`;
+      drawChart(); elChartCard.scrollIntoView({behavior:'smooth', block:'start'});
     }
 
-    // Botón principal
-    document.getElementById('calcBtn').addEventListener('click', () => {
-      clearPenaltiesUI();
-      const algo = elAlgo.value;
-      if (algo === 'basic') runMonteCarloBasic(500000);
-      else runMonteCarloImproved(500000);
+    document.getElementById('calcBtn').addEventListener('click', ()=>{
+      clearPenaltiesUI(); const algo=elAlgo.value;
+      if(algo==='basic') runMonteCarloBasic(150000);
+      else runMonteCarloImproved(150000);
     });
 
-    /*************************
-     * Render de mesas por zona
-     *************************/
-    function renderTables(assign = state.assignment) {
-      byZone.terraza.innerHTML = '';
-      byZone.salon1.innerHTML = '';
-      byZone.salon2.innerHTML = '';
-      byZone.salon3.innerHTML = '';
-
-      for (const t of TABLES) {
-        const container =
-          t.zone === 'terraza' ? byZone.terraza :
-          t.zone === 'salon1' ? byZone.salon1 :
-          t.zone === 'salon2' ? byZone.salon2 :
-          byZone.salon3;
-
-        const tile = document.createElement('div');
-        tile.className = 'table-tile';
-        const resId = assign.get(t.id);
-        const r = resId ? state.reservations.find(x=>x.id===resId) : null;
-
-        const warnPref =
-          r && ( (t.terrace && r.terrace === 'no') || (!t.terrace && r.terrace === 'si') )
-            ? ' · ⚠ Preferencia mal ubicada'
-            : '';
-        const warnOverflowSingle = r && (r.pax > t.maxCap) ? ' · ❌ No cabe en 1 mesa' : '';
-        const kidsIcon = r ? (r.kids === 'si' ? ' · 👶' : '') : '';
-        const celebIcon = r ? (r.celebration === 'si' ? ' · 🎉' : '') : '';
-
+    function renderTables(assign=state.assignment){
+      byZone.terraza.innerHTML=''; byZone.salon1.innerHTML=''; byZone.salon2.innerHTML=''; byZone.salon3.innerHTML='';
+      for(const t of TABLES){
+        const container= t.zone==='terraza'?byZone.terraza : t.zone==='salon1'?byZone.salon1 : t.zone==='salon2'?byZone.salon2 : byZone.salon3;
+        const tile=document.createElement('div'); tile.className='table-tile';
+        const resId=assign.get(t.id); const r=resId?state.reservations.find(x=>x.id===resId):null;
+        const warnPref= r && ((t.terrace && r.terrace==='no')||(!t.terrace&&r.terrace==='si')) ? ' · ⚠ Preferencia mal ubicada' : '';
+        const warnOverflowSingle= r && (r.pax>t.maxCap) ? ' · ❌ No cabe en 1 mesa' : '';
+        const kidsIcon = r ? (r.kids==='si'?' · 👶':'') : '';
+        const celebIcon = r ? (r.celebration==='si'?' · 🎉':'') : '';
         tile.innerHTML = `
           <div>
-            <b>${t.terrace ? 'Terraza' : t.zone.replace('salon','Salón ') } · ${t.name}</b>
+            <b>${t.terrace ? 'Terraza' : t.zone.replace('salon','Salón ')} · ${t.name}</b>
             <span class="badge">Cap: ${t.minCap}–${t.maxCap}</span>
             <div class="cap">Posición zona: ${t.pos + 1}</div>
           </div>
           <div style="margin-top:6px">
-            ${r
-              ? `${escapeHtml(r.name)} (${r.pax})${kidsIcon}${celebIcon}${warnPref}${warnOverflowSingle}`
-              : '<span class="note">Libre</span>'}
-          </div>
-        `;
+            ${r ? `${escapeHtml(r.name)} (${r.pax})${kidsIcon}${celebIcon}${warnPref}${warnOverflowSingle}` : '<span class="note">Libre</span>'}
+          </div>`;
         container.appendChild(tile);
       }
     }
 
-    /*************************
-     * Render de penalizaciones (tarjeta 3)
-     *************************/
-    function clearPenaltiesUI() {
-      elPenBody.innerHTML = '';
-      elPenTotal.textContent = '0';
-      elPenCard.style.display = 'none';
-      elChartCard.style.display = 'none';
-    }
-
-    function renderPenalties(penalties) {
-      const total = penalties.reduce((a,b)=>a + b.puntos, 0);
-      elPenTotal.textContent = String(total);
-
-      const byMesa = new Map();
-      for (const p of penalties) {
-        const key = p.mesaId ?? 'none';
-        if (!byMesa.has(key)) byMesa.set(key, []);
-        byMesa.get(key).push(p);
-      }
-
-      const keys = [...byMesa.keys()].sort((a,b)=>{
-        if (a === 'none') return 1;
-        if (b === 'none') return -1;
-        return Number(a) - Number(b);
-      });
-
-      const frag = document.createDocumentFragment();
-
-      if (keys.length === 0) {
-        const empty = document.createElement('div');
-        empty.className = 'note';
-        empty.textContent = 'No hay penalizaciones.';
-        frag.appendChild(empty);
-      }
-
-      for (const key of keys) {
-        const list = byMesa.get(key);
-        const mesa = key === 'none' ? null : tableById.get(Number(key));
-        const subtotal = list.reduce((a,b)=>a+b.puntos, 0);
-
-        const byType = new Map();
-        for (const p of list) {
-          if (!byType.has(p.tipo)) byType.set(p.tipo, []);
-          byType.get(p.tipo).push(p);
-        }
-        const typeKeys = [...byType.keys()].sort();
-
-        const wrap = document.createElement('div');
-        wrap.className = 'pen-mesa';
-
-        const head = document.createElement('div');
-        head.className = 'pen-mesa-head';
+    function clearPenaltiesUI(){ elPenBody.innerHTML=''; elPenTotal.textContent='0'; elPenCard.style.display='none'; elChartCard.style.display='none'; }
+    function renderPenalties(penalties){
+      const total=penalties.reduce((a,b)=>a+b.puntos,0); elPenTotal.textContent=String(total);
+      const byMesa=new Map(); for(const p of penalties){ const key=p.mesaId??'none'; if(!byMesa.has(key)) byMesa.set(key,[]); byMesa.get(key).push(p); }
+      const keys=[...byMesa.keys()].sort((a,b)=>{ if(a==='none') return 1; if(b==='none') return -1; return Number(a)-Number(b); });
+      const frag=document.createDocumentFragment();
+      if(keys.length===0){ const empty=document.createElement('div'); empty.className='note'; empty.textContent='No hay penalizaciones.'; empty.style.padding='6px'; frag.appendChild(empty); }
+      for(const key of keys){
+        const list=byMesa.get(key); const mesa=key==='none'?null:tableById.get(Number(key)); const subtotal=list.reduce((a,b)=>a+b.puntos,0);
+        const byType=new Map(); for(const p of list){ if(!byType.has(p.tipo)) byType.set(p.tipo,[]); byType.get(p.tipo).push(p); }
+        const typeKeys=[...byType.keys()].sort();
+        const wrap=document.createElement('div'); wrap.className='pen-mesa';
+        const head=document.createElement('div'); head.className='pen-mesa-head';
         head.innerHTML = `
-          <div>
-            ${mesa
-              ? `<span class="chip">Mesa #${mesa.id}</span><span class="chip">${mesa.name}</span><span class="chip">${mesa.zone === 'terraza' ? 'Terraza' : ('Salón ' + mesa.zone.replace('salon',''))}</span>`
-              : `<span class="chip">Otros (sin mesa asociada)</span>`}
-          </div>
-          <div><b>${subtotal}</b></div>
-        `;
+          <div>${mesa?`<span class="chip">Mesa #${mesa.id}</span><span class="chip">${mesa.name}</span><span class="chip">${mesa.zone==='terraza'?'Terraza':('Salón '+mesa.zone.replace('salon',''))}</span>`:`<span class="chip">Otros (sin mesa asociada)</span>`}</div>
+          <div><b>${subtotal}</b></div>`;
         wrap.appendChild(head);
-
-        const grid = document.createElement('div');
-        grid.className = 'pen-grid';
-
-        for (const t of typeKeys) {
-          const items = byType.get(t);
-          const pts = items.reduce((a,b)=>a+b.puntos, 0);
-
-          const box = document.createElement('div');
-          box.className = 'pen-box';
-          box.innerHTML = `<h4>${TYPE_LABEL[t] || t} <span class="pts">${pts}</span></h4>`;
-
-          const ul = document.createElement('ul');
-          ul.className = 'pen-list';
-          for (const e of items) {
-            const li = document.createElement('li');
-            const ridTxt = e.reservaId ? `Reserva ${e.reservaId}: ` : '';
-            li.textContent = `${ridTxt}${e.detalle || 'Sin detalle'}`;
-            ul.appendChild(li);
-          }
-          box.appendChild(ul);
-          grid.appendChild(box);
+        const grid=document.createElement('div'); grid.className='pen-grid';
+        for(const t of typeKeys){
+          const items=byType.get(t); const pts=items.reduce((a,b)=>a+b.puntos,0);
+          const box=document.createElement('div'); box.className='pen-box';
+          box.innerHTML=`<h4>${TYPE_LABEL[t]||t} <span class="pts">${pts}</span></h4>`;
+          const ul=document.createElement('ul'); ul.className='pen-list';
+          for(const e of items){ const li=document.createElement('li'); const ridTxt=e.reservaId?`Reserva ${e.reservaId}: `:''; li.textContent=`${ridTxt}${e.detalle||'Sin detalle'}`; ul.appendChild(li); }
+          box.appendChild(ul); grid.appendChild(box);
         }
-
-        wrap.appendChild(grid);
-        frag.appendChild(wrap);
+        wrap.appendChild(grid); frag.appendChild(wrap);
       }
-
-      elPenBody.innerHTML = '';
-      elPenBody.appendChild(frag);
-      elPenCard.style.display = 'block';
-      elPenCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      elPenBody.innerHTML=''; elPenBody.appendChild(frag); elPenCard.style.display='block'; elPenCard.scrollIntoView({behavior:'smooth', block:'start'});
     }
 
-    /*************************
-     * Formulario: guardar y render listado
-     *************************/
-    elSave.onclick = () => {
-      const name = (elName.value || '').trim();
-      const pax = parseInt(elPax.value, 10);
-      if (!name) return alert('Introduce un nombre');
-      if (!Number.isFinite(pax) || pax < 1) return alert('Introduce un número de personas válido');
+    elSave.onclick = ()=>{
+      const name=(elName.value||'').trim(); const pax=parseInt(elPax.value,10);
+      if(!name) return alert('Introduce un nombre');
+      if(!Number.isFinite(pax)||pax<1) return alert('Introduce un número de personas válido');
 
-      // Preferencia elegida
-      const prefSalon = elPrefSalon.value; // 'ninguno' | 'salon1' | 'salon2' | 'salon3'
-      const prefTableId = elPrefTable.value ? Number(elPrefTable.value) : null;
+      const prefSalon=elPrefSalon.value; const prefTableId=elPrefTable.value?Number(elPrefTable.value):null;
+      const storedPrefTableId=(prefSalon==='ninguno')?null:prefTableId;
 
-      // Si el salón es "ninguno", ignoramos la mesa
-      const storedPrefTableId = (prefSalon === 'ninguno') ? null : prefTableId;
-
-      const r = {
-        id: Date.now(),
-        name,
-        pax,
-        terrace: elTerrace.value,
-        kids: elKids.value,
-        celebration: elCelebration.value,
-        prefSalon,
-        prefTableId: storedPrefTableId
-      };
-
-      state.reservations.push(r);
-      saveReservationsToStorage(state.reservations);
-      renderReservations();
-
-      // Reset form
-      elName.value=''; elPax.value='';
-      elTerrace.value='no'; elKids.value='no'; elCelebration.value='no';
-      elPrefSalon.value='ninguno';
-      refreshPrefTableOptions(); // limpia select de mesa
-      elPrefTable.value='';
-
-      if (elBestScore) elBestScore.textContent = '—';
-      state.assignment = new Map(TABLES.map(t=>[t.id,null]));
-      renderTables();
-      clearPenaltiesUI();
+      const r={ id:Date.now(), name, pax, terrace:elTerrace.value, kids:elKids.value, celebration:elCelebration.value, prefSalon, prefTableId:storedPrefTableId };
+      state.reservations.push(r); saveReservationsToStorage(state.reservations); renderReservations();
+      elName.value=''; elPax.value=''; elTerrace.value='no'; elKids.value='no'; elCelebration.value='no'; elPrefSalon.value='ninguno'; refreshPrefTableOptions(); elPrefTable.value='';
+      if(elBestScore) elBestScore.textContent='—';
+      state.assignment=new Map(TABLES.map(t=>[t.id,null])); renderTables(); clearPenaltiesUI();
     };
 
     function renderReservations(){
-      elList.innerHTML = '';
-      if (!state.reservations.length) {
-        const empty = document.createElement('div');
-        empty.className = 'note';
-        empty.style.padding = '10px';
-        empty.textContent = 'No hay reservas aún.';
-        elList.appendChild(empty);
-        return;
-      }
+      elList.innerHTML=''; if(!state.reservations.length){ const empty=document.createElement('div'); empty.className='note'; empty.style.padding='10px'; empty.textContent='No hay reservas aún.'; elList.appendChild(empty); return; }
       state.reservations.forEach(r=>{
-        const row = document.createElement('div');
-        row.className='res-row';
-
-        // Texto preferencia
-        let prefTxt = '—';
-        if (r.prefSalon && r.prefSalon !== 'ninguno') {
-          const mesa = r.prefTableId ? tableById.get(Number(r.prefTableId)) : null;
-          const salonNum = r.prefSalon.replace('salon','');
-          prefTxt = `Salón ${salonNum}${mesa ? ' · ' + mesa.name : ''}`;
-        }
-
+        let prefTxt='—'; if(r.prefSalon && r.prefSalon!=='ninguno'){ const mesa=r.prefTableId?tableById.get(Number(r.prefTableId)):null; const salonNum=r.prefSalon.replace('salon',''); prefTxt=`Salón ${salonNum}${mesa?' · '+mesa.name:''}`; }
+        const row=document.createElement('div'); row.className='res-row';
         row.innerHTML=`
           <div>${escapeHtml(r.name)}</div>
           <div>${r.pax}</div>
-          <div>${r.terrace === 'si' ? 'Sí' : 'No'}</div>
-          <div>${r.kids === 'si' ? '<span class="tag kids">Sí</span>' : '<span class="tag nokids">No</span>'}</div>
-          <div>${r.celebration === 'si' ? '<span class="tag celebr">Sí 🎉</span>' : 'No'}</div>
+          <div>${r.terrace==='si'?'Sí':'No'}</div>
+          <div>${r.kids==='si'?'<span class="tag kids">Sí</span>':'<span class="tag nokids">No</span>'}</div>
+          <div>${r.celebration==='si'?'<span class="tag celebr">Sí 🎉</span>':'No'}</div>
           <div>${prefTxt}</div>
           <div><button class="danger" onclick="deleteRes(${r.id})">Eliminar</button></div>`;
         elList.appendChild(row);
@@ -1495,62 +864,25 @@
 
     window.deleteRes=id=>{
       state.reservations=state.reservations.filter(x=>x.id!==id);
-      saveReservationsToStorage(state.reservations);
-      renderReservations();
-      if (elBestScore) elBestScore.textContent = '—';
-      state.assignment = new Map(TABLES.map(t=>[t.id,null]));
-      renderTables();
-      clearPenaltiesUI();
+      saveReservationsToStorage(state.reservations); renderReservations();
+      if(elBestScore) elBestScore.textContent='—';
+      state.assignment=new Map(TABLES.map(t=>[t.id,null])); renderTables(); clearPenaltiesUI();
     };
 
     function escapeHtml(s){ return String(s).replace(/[&<>"']/g, m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m])); }
 
-    /*************************
-     * Pref: opciones de mesa por salón
-     *************************/
-    function refreshPrefTableOptions() {
-      const salon = elPrefSalon.value;
-      elPrefTable.innerHTML = '';
-      if (salon === 'ninguno') {
-        const opt = document.createElement('option');
-        opt.value = '';
-        opt.textContent = '— Selecciona salón —';
-        elPrefTable.appendChild(opt);
-        elPrefTable.disabled = true;
-        return;
-      }
-      elPrefTable.disabled = false;
-      const list = zones[salon] || [];
-      const placeholder = document.createElement('option');
-      placeholder.value = '';
-      placeholder.textContent = '— Selecciona mesa —';
-      elPrefTable.appendChild(placeholder);
-      for (const t of list) {
-        const opt = document.createElement('option');
-        opt.value = String(t.id);
-        opt.textContent = t.name;
-        elPrefTable.appendChild(opt);
-      }
+    function refreshPrefTableOptions(){
+      const salon=elPrefSalon.value; elPrefTable.innerHTML='';
+      if(salon==='ninguno'){ const opt=document.createElement('option'); opt.value=''; opt.textContent='— Selecciona salón —'; elPrefTable.appendChild(opt); elPrefTable.disabled=true; return; }
+      elPrefTable.disabled=false; const list=zones[salon]||[]; const placeholder=document.createElement('option'); placeholder.value=''; placeholder.textContent='— Selecciona mesa —'; elPrefTable.appendChild(placeholder);
+      for(const t of list){ const opt=document.createElement('option'); opt.value=String(t.id); opt.textContent=t.name; elPrefTable.appendChild(opt); }
     }
-
     elPrefSalon.addEventListener('change', refreshPrefTableOptions);
 
-    /*************************
-     * INIT
-     *************************/
     (function init(){
-      state.reservations = loadReservationsFromStorage();
-      // Backfill campos nuevos
-      state.reservations = state.reservations.map(r => ({
-        ...r,
-        celebration: r.celebration || 'no',
-        prefSalon: r.prefSalon || 'ninguno',
-        prefTableId: r.prefSalon && r.prefSalon !== 'ninguno' ? (r.prefTableId ?? null) : null
-      }));
-      renderReservations();
-      renderTables();
-      clearPenaltiesUI();
-      refreshPrefTableOptions();
+      state.reservations=loadReservationsFromStorage();
+      state.reservations=state.reservations.map(r=>({ ...r, celebration:r.celebration||'no', prefSalon:r.prefSalon||'ninguno', prefTableId:(r.prefSalon&&r.prefSalon!=='ninguno')?(r.prefTableId??null):null }));
+      renderReservations(); renderTables(); clearPenaltiesUI(); refreshPrefTableOptions();
     })();
   </script>
 </body>
